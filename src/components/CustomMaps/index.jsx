@@ -1,4 +1,3 @@
-// components/CustomMaps.js
 import { GoogleMap, InfoWindow, useJsApiLoader } from "@react-google-maps/api";
 import React, { useState, useCallback, useEffect } from "react";
 import { CustomMarker } from "../CustomMarker";
@@ -6,24 +5,14 @@ import { app } from "../../api/api";
 
 export function CustomMaps() {
   const [marcadores, setMarcadores] = useState([]);
-  useEffect(() => {
-    const getData = async () => {
-      const response = await app.get(`/markers`);
-      setMarcadores(response.data);
-    };
-    getData();
-  }, []);
-
-  console.log(marcadores);
-
+  const [markers, setMarkers] = useState([]);
+  const [selected, setSelected] = useState(null);
   const apiKey = process.env.REACT_APP_API_KEY_MAPS;
+
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: apiKey,
   });
-
-  const [selected, setSelected] = useState(null);
-  const [markers, setMarkers] = useState([]);
 
   const initialPosition = {
     lat: -2.52997716338038,
@@ -150,36 +139,68 @@ export function CustomMaps() {
   }, []);
 
   useEffect(() => {
-    if (isLoaded) {
-      const Markers = [
-        {
-          id: 1,
-          address: "Rua da Panair, 186",
-          label: "Posição Teste 1",
-          status: true,
-        },
-        {
-          id: 2,
-          address: "Avenida Ana Jansen, 200",
-          label: "Posição Teste 2",
-          status: false,
-        },
-      ];
+    const getData = async () => {
+      const response = await app.get(`/markers`);
+      setMarcadores(response.data);
+    };
+    getData();
+  }, []);
+
+  console.log(marcadores);
+
+  // async function AddMarker() {
+  //   try {
+  //     await app.post("/markers", {
+  //       nome: 'telespectador',
+  //       rua: "Rua da Panair",
+  //       bairro: 'Tirirical',
+  //       numero: 186,
+  //       cidade: 'São Luís',
+  //       status: false,
+  //     });
+  //     document.location.reload(true);
+  //     alert("Marcador criado!");
+  //   } catch {
+  //     alert("Ocorreu um erro. Tente novamente.");
+  //   }
+  // }
+
+  // AddMarker();
+  
+  useEffect(() => {
+    if (isLoaded && marcadores.length > 0) {
+      // const Markers = [
+      //   {
+      //     id: 1,
+      //     address: "Rua da Panair, 186",
+      //     label: "Posição Teste 1",
+      //     status: true,
+      //   },
+      //   {
+      //     id: 2,
+      //     address: "Avenida Ana Jansen, 200",
+      //     label: "Posição Teste 2",
+      //     status: false,
+      //   },
+      // ];
 
       Promise.all(
-        Markers.map((marker) =>
-          geocodeAddress(marker.address).then((position) => ({
-            id: marker.id,
+        marcadores.map((marcador) =>
+          geocodeAddress(
+            `${marcador.rua}, ${marcador.numero}, ${marcador.bairro}. ${marcador.cidade}`
+          ).then((position) => ({
+            id: marcador.id,
             position: position,
-            label: marker.label,
-            status: marker.status,
+            label: marcador.nome, // Garantir que label seja uma string
+            bairro: marcador.bairro,
+            status: marcador.status,
           }))
         )
       ).then((newMarkers) => {
         setMarkers(newMarkers.filter((marker) => marker.position !== null));
       });
     }
-  }, [isLoaded, geocodeAddress]);
+  }, [isLoaded, geocodeAddress, marcadores]);
 
   const handleMapClick = useCallback(() => {
     setSelected(null);
@@ -208,7 +229,7 @@ export function CustomMaps() {
           <CustomMarker
             key={index}
             position={marker.position}
-            label={marker.label}
+            label={marker.bairro}
             onClick={() => setSelected(marker)}
             icon={"/logo.png"}
           />
@@ -223,7 +244,7 @@ export function CustomMaps() {
             style={{ maxWidth: "400px" }}
             className="flex flex-col items-center text-black p-4"
           >
-            <h2 className="text-lg font-bold mb-2">{selected.label}</h2>
+            <h2 className="text-lg font-bold mb-2">{selected.bairro}</h2>
             <img className="w-24 h-24 mb-2" src="/logo.png" alt="Logo" />
             <p className="mt-0 mb-2">
               Este é um texto que aparece ao clicar no marcador.
