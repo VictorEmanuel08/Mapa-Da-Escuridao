@@ -2,7 +2,16 @@
 module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        background: "#EFEFEF",
+        blue_primary: "#1F3241",
+        blue_secondary: "#03121F",
+      },
+    },
+    fontFamily: {
+      poppins: ["Poppins"],
+    },
   },
   plugins: [
     function ({ addBase }) {

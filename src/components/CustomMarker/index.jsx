@@ -8,7 +8,7 @@ export function CustomMarker({ position, label, onClick, icon }) {
       options={{
         label: {
           text: label,
-          className: "m-[-35px]",
+          className: "m-[-30px]",
           color: "white",
           fontWeight: "bold",
         },

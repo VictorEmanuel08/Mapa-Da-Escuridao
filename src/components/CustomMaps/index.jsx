@@ -1,12 +1,19 @@
 import { GoogleMap, InfoWindow, useJsApiLoader } from "@react-google-maps/api";
 import React, { useState, useCallback, useEffect } from "react";
+import { MdMenu } from "react-icons/md";
 import { CustomMarker } from "../CustomMarker";
 import { app } from "../../api/api";
+import { MapStyle } from "../MapStyle";
+import iconGeneral from "../../assets/iconGeneral.png";
+import iconOn from "../../assets/iconOn.png";
+import iconOff from "../../assets/iconOff.png";
 
 export function CustomMaps() {
   const [marcadores, setMarcadores] = useState([]);
   const [markers, setMarkers] = useState([]);
   const [selected, setSelected] = useState(null);
+  const [filterType, setFilterType] = useState("general");
+
   const apiKey = process.env.REACT_APP_API_KEY_MAPS;
 
   const { isLoaded } = useJsApiLoader({
@@ -19,99 +26,8 @@ export function CustomMaps() {
     lng: -44.23187759309891,
   };
 
-  const darkMapStyles = [
-    { elementType: "geometry", stylers: [{ color: "#212121" }] },
-    { elementType: "labels.icon", stylers: [{ visibility: "off" }] },
-    { elementType: "labels.text.fill", stylers: [{ color: "#757575" }] },
-    { elementType: "labels.text.stroke", stylers: [{ color: "#212121" }] },
-    {
-      featureType: "administrative",
-      elementType: "geometry",
-      stylers: [{ color: "#757575" }],
-    },
-    {
-      featureType: "administrative.country",
-      elementType: "labels.text.fill",
-      stylers: [{ color: "#9e9e9e" }],
-    },
-    {
-      featureType: "administrative.land_parcel",
-      stylers: [{ visibility: "off" }],
-    },
-    {
-      featureType: "administrative.locality",
-      elementType: "labels.text.fill",
-      stylers: [{ color: "#bdbdbd" }],
-    },
-    {
-      featureType: "poi",
-      elementType: "labels.text.fill",
-      stylers: [{ color: "#757575" }],
-    },
-    {
-      featureType: "poi.park",
-      elementType: "geometry",
-      stylers: [{ color: "#181818" }],
-    },
-    {
-      featureType: "poi.park",
-      elementType: "labels.text.fill",
-      stylers: [{ color: "#616161" }],
-    },
-    {
-      featureType: "poi.park",
-      elementType: "labels.text.stroke",
-      stylers: [{ color: "#1b1b1b" }],
-    },
-    {
-      featureType: "road",
-      elementType: "geometry.fill",
-      stylers: [{ color: "#2c2c2c" }],
-    },
-    {
-      featureType: "road",
-      elementType: "labels.text.fill",
-      stylers: [{ color: "#8a8a8a" }],
-    },
-    {
-      featureType: "road.arterial",
-      elementType: "geometry",
-      stylers: [{ color: "#373737" }],
-    },
-    {
-      featureType: "road.highway",
-      elementType: "geometry",
-      stylers: [{ color: "#3c3c3c" }],
-    },
-    {
-      featureType: "road.highway.controlled_access",
-      elementType: "geometry",
-      stylers: [{ color: "#4e4e4e" }],
-    },
-    {
-      featureType: "road.local",
-      elementType: "labels.text.fill",
-      stylers: [{ color: "#616161" }],
-    },
-    {
-      featureType: "transit",
-      elementType: "labels.text.fill",
-      stylers: [{ color: "#757575" }],
-    },
-    {
-      featureType: "water",
-      elementType: "geometry",
-      stylers: [{ color: "#000000" }],
-    },
-    {
-      featureType: "water",
-      elementType: "labels.text.fill",
-      stylers: [{ color: "#3d3d3d" }],
-    },
-  ];
-
   const mapOptions = {
-    styles: darkMapStyles,
+    styles: MapStyle,
     mapTypeControl: false, // Remove o controle de alternância de Map e Satellite
     streetViewControl: false, // Remove o boneco do Street View
     fullscreenControl: false, // Remove o botão de tela cheia
@@ -146,8 +62,6 @@ export function CustomMaps() {
     getData();
   }, []);
 
-  console.log(marcadores);
-
   // async function AddMarker() {
   //   try {
   //     await app.post("/markers", {
@@ -169,21 +83,6 @@ export function CustomMaps() {
 
   useEffect(() => {
     if (isLoaded && marcadores.length > 0) {
-      // const Markers = [
-      //   {
-      //     id: 1,
-      //     address: "Rua da Panair, 186",
-      //     label: "Posição Teste 1",
-      //     status: true,
-      //   },
-      //   {
-      //     id: 2,
-      //     address: "Avenida Ana Jansen, 200",
-      //     label: "Posição Teste 2",
-      //     status: false,
-      //   },
-      // ];
-
       Promise.all(
         marcadores.map((marcador) =>
           geocodeAddress(
@@ -191,7 +90,7 @@ export function CustomMaps() {
           ).then((position) => ({
             id: marcador.id,
             position: position,
-            label: marcador.nome, // Garantir que label seja uma string
+            label: marcador.nome,
             bairro: marcador.bairro,
             status: marcador.status,
           }))
@@ -213,45 +112,94 @@ export function CustomMaps() {
     };
   };
 
+  const filterMarkers = (type) => {
+    switch (type) {
+      case "off":
+        return markers.filter((marker) => !marker.status);
+      case "on":
+        return markers.filter((marker) => marker.status);
+      default:
+        return markers;
+    }
+  };
+
   if (!isLoaded) return <div>Loading...</div>;
 
   return (
-    <GoogleMap
-      mapContainerStyle={{ width: "100%", height: "100%" }}
-      center={initialPosition}
-      zoom={13}
-      options={mapOptions}
-      onClick={handleMapClick}
-    >
-      {markers
-        .filter((marker) => marker.status) // Apenas status=true
-        .map((marker, index) => (
+    <div className="relative w-full h-screen font-poppins">
+      <div className="absolute flex flex-row items-center justify-around w-[347px] h-[100px] top-4 right-4 bg-[#1F3241] p-4 rounded-lg shadow-lg z-10 text-[16px]">
+        <button
+          className="flex flex-col items-center justify-center"
+          onClick={() => setFilterType("off")}
+        >
+          <div className="flex items-center justify-center">
+            <img className="w-8" src={iconOff} alt="Ícone Lâmpada Desligada" />
+          </div>
+          <p>Sem Luz</p>
+        </button>
+        <button
+          className="flex flex-col items-center justify-center"
+          onClick={() => setFilterType("on")}
+        >
+          <div className="flex items-center justify-center">
+            <img className="w-12" src={iconOn} alt="Ícone Lâmpada Ligada" />
+          </div>
+          <p>Com Luz</p>
+        </button>
+        <button
+          className="flex flex-col items-center justify-center"
+          onClick={() => setFilterType("general")}
+        >
+          <div className="flex items-center justify-center">
+            <img
+              className="w-10"
+              src={iconGeneral}
+              alt="Ícone Lâmpada Parcialmente Desligada e Parcialmente Ligada"
+            />
+          </div>
+          <p>Geral</p>
+        </button>
+      </div>
+      <div className="absolute flex flex-col items-center justify-start w-[40px] h-[100px] top-4 left-4 bg-[#1F3241] p-4 rounded-lg shadow-lg z-10">
+        <button className="text-[24px]">
+          <MdMenu />
+        </button>
+      </div>
+      <GoogleMap
+        mapContainerStyle={{ width: "100%", height: "100%" }}
+        center={initialPosition}
+        zoom={13}
+        options={mapOptions}
+        onClick={handleMapClick}
+      >
+        {filterMarkers(filterType).map((marker, index) => (
           <CustomMarker
             key={index}
             position={marker.position}
             label={marker.bairro}
             onClick={() => setSelected(marker)}
-            icon={"/logo.png"}
+            icon={marker.status ? iconOn : iconOff}
           />
         ))}
-      {selected && (
-        <InfoWindow
-          position={getInfoWindowPosition(selected.position)}
-          onCloseClick={() => setSelected(null)}
-          options={{ pixelOffset: new window.google.maps.Size(0, -20) }} // Ajuste de offset vertical para posicionar o InfoWindow
-        >
-          <div
-            style={{ maxWidth: "400px" }}
-            className="flex flex-col items-center text-black p-4"
+        {selected && (
+          <InfoWindow
+            position={getInfoWindowPosition(selected.position)}
+            onCloseClick={() => setSelected(null)}
+            options={{ pixelOffset: new window.google.maps.Size(0, -20) }} // Ajuste de offset vertical para posicionar o InfoWindow
           >
-            <h2 className="text-lg font-bold mb-2">{selected.bairro}</h2>
-            <img className="w-24 h-24 mb-2" src="/logo.png" alt="Logo" />
-            <p className="mt-0 mb-2">
-              Este é um texto que aparece ao clicar no marcador.
-            </p>
-          </div>
-        </InfoWindow>
-      )}
-    </GoogleMap>
+            <div
+              style={{ maxWidth: "400px" }}
+              className="flex flex-col items-center text-black p-4"
+            >
+              <h2 className="text-lg font-bold mb-2">{selected.bairro}</h2>
+              <img className="w-24 h-24 mb-2" src="/logo.png" alt="Logo" />
+              <p className="mt-0 mb-2">
+                Este é um texto que aparece ao clicar no marcador.
+              </p>
+            </div>
+          </InfoWindow>
+        )}
+      </GoogleMap>
+    </div>
   );
 }
