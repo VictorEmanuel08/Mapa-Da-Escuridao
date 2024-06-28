@@ -8,13 +8,14 @@ export function CustomMarker({ position, label, onClick, icon }) {
       options={{
         label: {
           text: label,
-          className: "m-[-30px]",
+          className: "m-[-32px]",
           color: "white",
           fontWeight: "bold",
+          fontSize: "18px",
         },
         icon: {
           url: icon,
-          scaledSize: new window.google.maps.Size(24, 24),
+          scaledSize: new window.google.maps.Size(32, 32),
         },
       }}
       onClick={onClick}

@@ -1,18 +1,24 @@
 import { GoogleMap, InfoWindow, useJsApiLoader } from "@react-google-maps/api";
 import React, { useState, useCallback, useEffect } from "react";
 import { MdMenu } from "react-icons/md";
-import { CustomMarker } from "../CustomMarker";
 import { app } from "../../api/api";
 import { MapStyle } from "../MapStyle";
-import iconGeneral from "../../assets/iconGeneral.png";
-import iconOn from "../../assets/iconOn.png";
-import iconOff from "../../assets/iconOff.png";
+import iconGeneral from "../../assets/iconGeneral.svg";
+import iconOn from "../../assets/iconOn.svg";
+import iconOff from "../../assets/iconOff.svg";
+import { Sidebar } from "../Sidebar";
+import { CustomMarker } from "../CustomMarker";
 
-export function CustomMaps() {
+export function ContentMaps() {
   const [marcadores, setMarcadores] = useState([]);
   const [markers, setMarkers] = useState([]);
   const [selected, setSelected] = useState(null);
   const [filterType, setFilterType] = useState("general");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
 
   const apiKey = process.env.REACT_APP_API_KEY_MAPS;
 
@@ -126,25 +132,35 @@ export function CustomMaps() {
   if (!isLoaded) return <div>Loading...</div>;
 
   return (
-    <div className="relative w-full h-screen font-poppins">
-      <div className="absolute flex flex-row items-center justify-around w-[347px] h-[100px] top-4 right-4 bg-[#1F3241] p-4 rounded-lg shadow-lg z-10 text-[16px]">
+    <div className="relative w-full h-screen bg-background overflow-x-hidden font-poppins">
+      <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+      <div
+        className={`absolute z-10 transform ${
+          isSidebarOpen ? "translate-x-64" : "translate-x-0"
+        } transition-transform duration-300 ease-in-out`}
+      >
+        <div
+          className="absolute flex items-start justify-center w-[40px] h-[100px] top-4 left-0 bg-blue_primary p-4 rounded-r-lg shadow-lg text-white text-[24px] cursor-pointer"
+          onClick={toggleSidebar}
+        >
+          <button className="text-[24px]">
+            <MdMenu />
+          </button>
+        </div>
+      </div>
+      <div className="z-10 absolute flex flex-row items-center justify-around w-[347px] h-[100px] top-4 right-4 bg-[#1F3241] p-4 rounded-lg shadow-lg text-[16px]">
         <button
           className="flex flex-col items-center justify-center"
           onClick={() => setFilterType("off")}
         >
           <div className="flex items-center justify-center">
-            <img className="w-8" src={iconOff} alt="Ícone Lâmpada Desligada" />
+            <img
+              className="w-1/2"
+              src={iconOff}
+              alt="Ícone Lâmpada Desligada"
+            />
           </div>
           <p>Sem Luz</p>
-        </button>
-        <button
-          className="flex flex-col items-center justify-center"
-          onClick={() => setFilterType("on")}
-        >
-          <div className="flex items-center justify-center">
-            <img className="w-12" src={iconOn} alt="Ícone Lâmpada Ligada" />
-          </div>
-          <p>Com Luz</p>
         </button>
         <button
           className="flex flex-col items-center justify-center"
@@ -152,17 +168,21 @@ export function CustomMaps() {
         >
           <div className="flex items-center justify-center">
             <img
-              className="w-10"
+              className="w-1/2"
               src={iconGeneral}
               alt="Ícone Lâmpada Parcialmente Desligada e Parcialmente Ligada"
             />
           </div>
           <p>Geral</p>
         </button>
-      </div>
-      <div className="absolute flex flex-col items-center justify-start w-[40px] h-[100px] top-4 left-4 bg-[#1F3241] p-4 rounded-lg shadow-lg z-10">
-        <button className="text-[24px]">
-          <MdMenu />
+        <button
+          className="flex flex-col items-center justify-center "
+          onClick={() => setFilterType("on")}
+        >
+          <div className="flex items-center justify-center">
+            <img className="w-1/2" src={iconOn} alt="Ícone Lâmpada Ligada" />
+          </div>
+          <p>Com Luz</p>
         </button>
       </div>
       <GoogleMap

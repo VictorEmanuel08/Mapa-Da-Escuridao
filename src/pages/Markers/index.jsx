@@ -1,21 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { app } from "../../api/api";
-import { Sidebar } from "../../components/Sidebar";
-import { CreateMarker } from "../../components/Modals/CreateMarker";
 import Modal from "react-modal";
 import { MdMenu } from "react-icons/md";
+import { app } from "../../api/api";
+import iconGeneral from "../../assets/iconGeneral.svg";
+import iconOn from "../../assets/iconOn.svg";
+import iconOff from "../../assets/iconOff.svg";
+import { Sidebar } from "../../components/Sidebar";
+import { CreateMarker } from "../../components/Modals/CreateMarker";
+import { Table } from "../../components/Table";
 
 export function Markers() {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [marcadores, setMarcadores] = useState([]);
-  const [newMarker, setNewMarker] = useState({
-    nome: "",
-    rua: "",
-    bairro: "",
-    numero: "",
-    cidade: "",
-    status: true,
-  });
+  // const [newMarker, setNewMarker] = useState({
+  //   nome: "",
+  //   rua: "",
+  //   bairro: "",
+  //   numero: "",
+  //   cidade: "",
+  //   status: true,
+  // });
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const toggleSidebar = () => {
@@ -30,23 +34,25 @@ export function Markers() {
     getData();
   }, []);
 
-  const handleAddMarker = async () => {
-    try {
-      await app.post("/markers", newMarker);
-      setMarcadores([...marcadores, newMarker]);
-      setNewMarker({
-        nome: "",
-        rua: "",
-        bairro: "",
-        numero: "",
-        cidade: "",
-        status: true,
-      });
-      alert("Marcador criado!");
-    } catch {
-      alert("Ocorreu um erro. Tente novamente.");
-    }
-  };
+  console.log(marcadores);
+
+  // const handleAddMarker = async () => {
+  //   try {
+  //     await app.post("/markers", newMarker);
+  //     setMarcadores([...marcadores, newMarker]);
+  //     setNewMarker({
+  //       nome: "",
+  //       rua: "",
+  //       bairro: "",
+  //       numero: "",
+  //       cidade: "",
+  //       status: true,
+  //     });
+  //     alert("Marcador criado!");
+  //   } catch {
+  //     alert("Ocorreu um erro. Tente novamente.");
+  //   }
+  // };
 
   function openModal() {
     setIsOpen(true);
@@ -62,15 +68,16 @@ export function Markers() {
       left: "50%",
       right: "auto",
       bottom: "auto",
-      marginRight: "-50%",
+      // marginRight: "-50%",
       transform: "translate(-50%, -50%)",
-      width: "50%",
-      height: "50%",
+      width: "40%",
+      height: "60%",
+      borderRadius: "0.5rem",
     },
   };
 
   return (
-    <div className="relative w-full h-screen bg-[#F1F1F1] overflow-x-hidden">
+    <div className="relative w-full h-screen bg-background overflow-x-hidden font-poppins">
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
       <div
         className={`transform ${
@@ -85,33 +92,80 @@ export function Markers() {
             <MdMenu />
           </button>
         </div>
-        <div className="flex flex-col w-full max-w-2xl p-4">
-          <div className="flex justify-between items-center mb-4">
-            <h1 className="text-xl font-bold">Lista de Marcadores</h1>
+        <div className="flex flex-col max-w-full p-8 ml-12 bg-background text-black space-y-8">
+          <div className="flex items-center">
+            <h1 className="text-2xl font-bold">Cadastro de locais</h1>
+          </div>
+          <div className="flex flex-row max-w-full justify-start space-x-12">
+            <div className="flex flex-row max-w-[50%] justify-between">
+              <div className="flex flex-col max-w-[30%] border border-[#FFA300] rounded-lg p-3">
+                <div className="flex flex-row items-center space-x-4">
+                  <p className="font-bold text-2xl">{marcadores.length}</p>
+                  <img
+                    className="w-1/6"
+                    src={iconGeneral}
+                    alt="Ícone Lâmpada Parcialmente Desligada e Parcialmente Ligada"
+                  />
+                </div>
+                <p className="font-normal text-lg">Bairros totais</p>
+              </div>
+              <div className="flex flex-col max-w-[30%] border border-[#FFA300] rounded-lg p-3">
+                <div className="flex flex-row items-center space-x-4">
+                  <p className="font-bold text-2xl">
+                    {
+                      marcadores.filter((marcador) => marcador.status === true)
+                        .length
+                    }
+                  </p>
+                  <img
+                    className="w-1/6"
+                    src={iconOn}
+                    alt="Ícone Lâmpada Ligada"
+                  />
+                </div>
+                <p className="font-normal text-lg">Bairros com luz</p>
+              </div>
+              <div className="flex flex-col max-w-[30%] border border-[#FFA300] rounded-lg p-3">
+                <div className="flex flex-row items-center space-x-4">
+                  <p className="font-bold text-2xl">
+                    {
+                      marcadores.filter((marcador) => marcador.status === false)
+                        .length
+                    }
+                  </p>
+                  <img
+                    className="w-1/6"
+                    src={iconOff}
+                    alt="Ícone Lâmpada Desligada"
+                  />
+                </div>
+                <p className="font-normal text-lg">Bairros sem luz</p>
+              </div>
+            </div>
             <button
-              className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg p-2"
+              className="flex items-center justify-center w-[13%] h-1/2 rounded-lg p-3 bg-blue_primary hover:bg-blue_secondary text-white"
               onClick={openModal}
             >
               Adicionar Marcador
             </button>
-            <Modal
-              isOpen={modalIsOpen}
-              onRequestClose={closeModal}
-              style={customStyles}
-              contentLabel="Adicionar Marcador"
-              shouldCloseOnOverlayClick={false}
-            >
-              <div className="relative">
-                <button
-                  onClick={closeModal}
-                  className="absolute top-0 right-0 m-2 text-gray-700"
-                >
-                  X
-                </button>
-                <CreateMarker />
-              </div>
-            </Modal>
           </div>
+          <input
+            className="max-w-[50%] bg-background border border-[#FFA300] rounded-lg p-1 focus:outline-none"
+            placeholder="Pesquisar bairro"
+          />
+          <div className="overflow-x-auto">
+            <Table />
+          </div>
+
+          <Modal
+            isOpen={modalIsOpen}
+            onRequestClose={closeModal}
+            style={customStyles}
+            contentLabel="Adicionar Marcador"
+            shouldCloseOnOverlayClick={false}
+          >
+            <CreateMarker />
+          </Modal>
         </div>
       </div>
     </div>
