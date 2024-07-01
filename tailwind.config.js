@@ -21,9 +21,10 @@ module.exports = {
           padding: 0,
           width: "100%",
           height: "100%",
-          // overflow: "hidden",
+          // overflow: "hidden", // Uncomment this line if you want to prevent scrolling
         },
       });
     },
+    require("@tailwindcss/forms"), // Adding the @tailwindcss/forms plugin
   ],
 };
