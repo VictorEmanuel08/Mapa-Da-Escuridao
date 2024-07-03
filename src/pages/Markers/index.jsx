@@ -12,14 +12,6 @@ import { Table } from "../../components/Table";
 export function Markers() {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [marcadores, setMarcadores] = useState([]);
-  // const [newMarker, setNewMarker] = useState({
-  //   nome: "",
-  //   rua: "",
-  //   bairro: "",
-  //   numero: "",
-  //   cidade: "",
-  //   status: true,
-  // });
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const toggleSidebar = () => {
@@ -35,24 +27,6 @@ export function Markers() {
   }, []);
 
   console.log(marcadores);
-
-  // const handleAddMarker = async () => {
-  //   try {
-  //     await app.post("/markers", newMarker);
-  //     setMarcadores([...marcadores, newMarker]);
-  //     setNewMarker({
-  //       nome: "",
-  //       rua: "",
-  //       bairro: "",
-  //       numero: "",
-  //       cidade: "",
-  //       status: true,
-  //     });
-  //     alert("Marcador criado!");
-  //   } catch {
-  //     alert("Ocorreu um erro. Tente novamente.");
-  //   }
-  // };
 
   function openModal() {
     setIsOpen(true);
@@ -71,7 +45,7 @@ export function Markers() {
       // marginRight: "-50%",
       transform: "translate(-50%, -50%)",
       width: "40%",
-      height: "60%",
+      height: "75%",
       borderRadius: "0.5rem",
     },
   };
@@ -163,8 +137,9 @@ export function Markers() {
             style={customStyles}
             contentLabel="Adicionar Marcador"
             shouldCloseOnOverlayClick={false}
+            ariaHideApp={false}
           >
-            <CreateMarker />
+            <CreateMarker closeModal={closeModal} />
           </Modal>
         </div>
       </div>

@@ -7,6 +7,7 @@ module.exports = {
         background: "#EFEFEF",
         blue_primary: "#1F3241",
         blue_secondary: "#03121F",
+        orange: "#FFA300",
       },
     },
     fontFamily: {

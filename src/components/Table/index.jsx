@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from "react";
+import Modal from "react-modal";
 import { app } from "../../api/api";
 import iconOn from "../../assets/iconOn.svg";
 import iconOff from "../../assets/iconOff.svg";
+import { EditMarker } from "../Modals/EditMarker";
 
 export function Table() {
   const [marcadores, setMarcadores] = useState([]);
+  const [modalIsOpen, setIsOpen] = useState(false);
+  const [selectedMarker, setSelectedMarker] = useState(null);
 
   useEffect(() => {
     const getData = async () => {
@@ -14,7 +18,29 @@ export function Table() {
     getData();
   }, []);
 
-  console.log(marcadores);
+  function openModal(marcador) {
+    setSelectedMarker(marcador);
+    setIsOpen(true);
+  }
+
+  function closeModal() {
+    setIsOpen(false);
+    setSelectedMarker(null);
+  }
+
+  const customStyles = {
+    content: {
+      top: "50%",
+      left: "50%",
+      right: "auto",
+      bottom: "auto",
+      // marginRight: "-50%",
+      transform: "translate(-50%, -50%)",
+      width: "40%",
+      height: "75%",
+      borderRadius: "0.5rem",
+    },
+  };
 
   return (
     <table className="min-w-[85%]">
@@ -62,13 +88,28 @@ export function Table() {
               {marcador.nome}
             </td>
             <td className="px-2 py-2 border-b border-[#FFD180]">
-              <button className="rounded-lg px-10 py-1 bg-blue_primary hover:bg-blue_secondary text-white">
+              <button
+                onClick={() => openModal(marcador)}
+                className="rounded-lg px-10 py-1 bg-blue_primary hover:bg-blue_secondary text-white"
+              >
                 Editar
               </button>
             </td>
           </tr>
         ))}
       </tbody>
+      {selectedMarker && (
+        <Modal
+          isOpen={modalIsOpen}
+          onRequestClose={closeModal}
+          style={customStyles}
+          contentLabel="Editar Marcador"
+          shouldCloseOnOverlayClick={false}
+          ariaHideApp={false}
+        >
+          <EditMarker closeModal={closeModal} id={selectedMarker.id_marker} />
+        </Modal>
+      )}
     </table>
   );
 }
