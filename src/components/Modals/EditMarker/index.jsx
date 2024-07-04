@@ -42,7 +42,7 @@ export function EditMarker({ closeModal, id }) {
 
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
-    setStatus(isChecked);
+    setStatus(!isChecked);
   };
 
   const handleFileChange = (index, event) => {

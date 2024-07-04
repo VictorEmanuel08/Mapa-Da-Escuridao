@@ -30,7 +30,8 @@ export const MapStyle = [
   {
     featureType: "poi.park",
     elementType: "geometry",
-    stylers: [{ color: "#181818" }],
+    stylers: [{ visibility: "off" }],
+    // stylers: [{ color: "#181818" }],
   },
   {
     featureType: "poi.park",

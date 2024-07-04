@@ -13,6 +13,7 @@ export function Markers() {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [marcadores, setMarcadores] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(""); // Estado para o termo de pesquisa
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -126,9 +127,11 @@ export function Markers() {
           <input
             className="max-w-[50%] bg-background border border-[#FFA300] rounded-lg p-1 focus:outline-none"
             placeholder="Pesquisar bairro"
+            value={searchTerm} // Valor do campo de pesquisa
+            onChange={(e) => setSearchTerm(e.target.value)} // Atualiza o termo de pesquisa
           />
           <div className="overflow-x-auto">
-            <Table />
+            <Table searchTerm={searchTerm}/>
           </div>
 
           <Modal

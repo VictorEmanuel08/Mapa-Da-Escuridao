@@ -2,7 +2,7 @@ import { GoogleMap, InfoWindow, useJsApiLoader } from "@react-google-maps/api";
 import React, { useState, useCallback, useEffect } from "react";
 import { MdMenu } from "react-icons/md";
 import { app } from "../../api/api";
-import { MapStyle } from "../MapStyle";
+import { MapStyle } from "../../style/MapStyle";
 import iconGeneral from "../../assets/iconGeneral.svg";
 import iconOn from "../../assets/iconOn.svg";
 import iconOff from "../../assets/iconOff.svg";
@@ -67,25 +67,6 @@ export function ContentMaps() {
     };
     getData();
   }, []);
-
-  // async function AddMarker() {
-  //   try {
-  //     await app.post("/markers", {
-  //       nome: 'telespectador',
-  //       rua: "Rua da Panair",
-  //       bairro: 'Tirirical',
-  //       numero: 186,
-  //       cidade: 'São Luís',
-  //       status: false,
-  //     });
-  //     document.location.reload(true);
-  //     alert("Marcador criado!");
-  //   } catch {
-  //     alert("Ocorreu um erro. Tente novamente.");
-  //   }
-  // }
-
-  // AddMarker();
 
   useEffect(() => {
     if (isLoaded && marcadores.length > 0) {
