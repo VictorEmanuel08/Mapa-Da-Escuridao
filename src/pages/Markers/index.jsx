@@ -26,8 +26,6 @@ export function Markers() {
     getData();
   }, []);
 
-  console.log(marcadores);
-
   function openModal() {
     setIsOpen(true);
   }

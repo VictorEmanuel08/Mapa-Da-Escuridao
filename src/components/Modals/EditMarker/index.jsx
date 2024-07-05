@@ -9,7 +9,7 @@ export function EditMarker({ closeModal, id }) {
   const [nome, setNome] = useState("");
   const [bairro, setBairro] = useState("");
   const [rua, setRua] = useState("");
-  const [numero, setNumero] = useState();
+  const [numero, setNumero] = useState("");
   const [status, setStatus] = useState(false);
   const [files, setFiles] = useState([null, null, null]);
   const [existingFiles, setExistingFiles] = useState([]);
@@ -42,7 +42,7 @@ export function EditMarker({ closeModal, id }) {
 
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
-    setStatus(isChecked);
+    setStatus(!isChecked);
   };
 
   const handleFileChange = (index, event) => {

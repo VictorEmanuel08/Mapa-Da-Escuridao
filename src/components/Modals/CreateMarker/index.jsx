@@ -13,8 +13,6 @@ export function CreateMarker({ closeModal }) {
   const [status, setStatus] = useState(false);
   const [files, setFiles] = useState([null, null, null]);
 
-  console.log(status);
-
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
     setStatus(!isChecked);

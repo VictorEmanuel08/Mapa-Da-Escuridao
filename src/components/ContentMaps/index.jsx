@@ -1,4 +1,4 @@
-import { GoogleMap, InfoWindow, useJsApiLoader } from "@react-google-maps/api";
+import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
 import React, { useState, useCallback, useEffect } from "react";
 import { MdMenu } from "react-icons/md";
 import { app } from "../../api/api";
@@ -7,7 +7,8 @@ import iconGeneral from "../../assets/iconGeneral.svg";
 import iconOn from "../../assets/iconOn.svg";
 import iconOff from "../../assets/iconOff.svg";
 import { Sidebar } from "../Sidebar";
-import { CustomMarker } from "../CustomMarker";
+import { CustomMarker } from "../Custom/CustomMarker";
+import { CustomInfoWindow } from "../Custom/CustomInfoWindow";
 
 export function ContentMaps() {
   const [marcadores, setMarcadores] = useState([]);
@@ -98,6 +99,10 @@ export function ContentMaps() {
             position: position,
             label: marcador.nome,
             bairro: marcador.bairro,
+            rua: marcador.rua,
+            numero: marcador.numero,
+            nome: marcador.nome,
+            files: marcador.files || [], // Certifique-se de que o objeto tenha um array de arquivos
             status: marcador.status,
           }))
         )
@@ -111,12 +116,12 @@ export function ContentMaps() {
     setSelected(null);
   }, []);
 
-  const getInfoWindowPosition = (position) => {
-    return {
-      lat: position.lat,
-      lng: position.lng,
-    };
-  };
+  // const getInfoWindowPosition = (position) => {
+  //   return {
+  //     lat: position.lat,
+  //     lng: position.lng,
+  //   };
+  // };
 
   const filterMarkers = (type) => {
     switch (type) {
@@ -201,7 +206,7 @@ export function ContentMaps() {
             icon={marker.status ? iconOn : iconOff}
           />
         ))}
-        {selected && (
+        {/* {selected && (
           <InfoWindow
             position={getInfoWindowPosition(selected.position)}
             onCloseClick={() => setSelected(null)}
@@ -209,7 +214,7 @@ export function ContentMaps() {
           >
             <div
               style={{ maxWidth: "400px" }}
-              className="flex flex-col items-center text-black p-4"
+              className="flex flex-col items-center justify-start text-black p-4"
             >
               <h2 className="text-lg font-bold mb-2">{selected.bairro}</h2>
               <img className="w-24 h-24 mb-2" src="/logo.png" alt="Logo" />
@@ -218,7 +223,8 @@ export function ContentMaps() {
               </p>
             </div>
           </InfoWindow>
-        )}
+        )} */}
+        <CustomInfoWindow selected={selected} setSelected={setSelected} />
       </GoogleMap>
     </div>
   );
