@@ -4,15 +4,15 @@ import iconOn from "../../../assets/iconOn.svg";
 import iconOff from "../../../assets/iconOff.svg";
 import { app } from "../../../api/api";
 
-export function EditMarker({ closeModal, id }) {
+export function EditMarker({ closeModal, id, varEdit }) {
   const [isChecked, setIsChecked] = useState(false);
   const [nome, setNome] = useState("");
   const [bairro, setBairro] = useState("");
   const [rua, setRua] = useState("");
   const [numero, setNumero] = useState("");
   const [status, setStatus] = useState(false);
+
   const [files, setFiles] = useState([null, null, null]);
-  const [existingFiles, setExistingFiles] = useState([]);
 
   useEffect(() => {
     const getDataMarker = async () => {
@@ -24,56 +24,46 @@ export function EditMarker({ closeModal, id }) {
       setNumero(data.numero || "");
       setStatus(data.status || false);
       setIsChecked(data.status || false);
-      setExistingFiles(data.files || []);
-      console.log(data);
-      // getDataFiles(data.id_marker);
+      //OBRIGA O VETOR DE ARQUIVOS TER SEMPRE 3 ITENS
+      const initialFiles = data.files ? data.files.slice(0, 3) : [];
+      const paddedFiles = [
+        ...initialFiles,
+        ...Array(3 - initialFiles.length).fill(null),
+      ];
+      setFiles(paddedFiles);
+      console.log(files);
+      getDataFiles(data.id_marker);
     };
     getDataMarker();
   }, [id]);
 
-  // // useEffect(() => {
-  // const getDataFiles = async (id) => {
-  //   const response = await app.get(`/files/${id}`);
-  //   const data = response.data;
-  //   console.log(data);
-  // };
-  // //   getDataFiles();
-  // // }, [id]);
+  const getDataFiles = async (id) => {
+    const response = await app.get(
+      `/files/110460ef-9803-433e-b5cd-b6a38d7fb4e0`
+    );
+    // const response = await app.get(`/files/${id}`);
+    const data = response.data;
+    console.log(data);
+  };
 
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
     setStatus(!isChecked);
   };
 
-  const handleFileChange = (index, event) => {
-    const file = event.target.files[0];
+  const handleFileChange = (index, e) => {
+    const file = e.target.files[0];
     if (file) {
       const newFiles = [...files];
-
-      // Encontra o primeiro índice disponível (onde o valor é null)
-      const firstAvailableIndex = newFiles.findIndex(
-        (preview) => preview === null
-      );
-
-      // Define a nova imagem no primeiro índice disponível ou no índice clicado
-      newFiles[firstAvailableIndex !== -1 ? firstAvailableIndex : index] = file;
-
+      newFiles[index] = { ...newFiles[index], arquivo: file };
       setFiles(newFiles);
     }
   };
 
-  const handleRemoveImage = (index) => {
-    // Remove a imagem do índice especificado
-    const newFiles = files.filter((_, i) => i !== index);
-
-    // Adiciona null no final do array para manter o tamanho
-    newFiles.push(null);
-
+  const handleRemoveFile = (index) => {
+    const newFiles = [...files];
+    newFiles[index] = null;
     setFiles(newFiles);
-
-    const newExistingFiles = [...existingFiles];
-    newExistingFiles[index] = null;
-    setExistingFiles(newExistingFiles);
   };
 
   const handleUpdateMarker = async () => {
@@ -87,9 +77,8 @@ export function EditMarker({ closeModal, id }) {
         status: status,
       });
       if (response.status === 200) {
-        handleAddFile(id);
+        handleUpdateFiles();
       }
-      console.log(response);
       document.location.reload(true);
       alert("Marcador atualizado!");
     } catch {
@@ -97,22 +86,22 @@ export function EditMarker({ closeModal, id }) {
     }
   };
 
-  const handleAddFile = async (id) => {
-    const formData = new FormData();
-    formData.append("id_marker", id);
-    files.forEach((file, index) => {
-      if (file) {
-        formData.append(`file${index + 1}`, file);
+  const handleUpdateFiles = async () => {
+    files.forEach(async (file) => {
+      if (file && file.arquivo) {
+        const formData = new FormData();
+        formData.append("arquivo", file.arquivo);
+
+        try {
+          await app.put(`/files/${file.id_file}`, formData);
+        } catch {
+          console.log("Erro: ", Error);
+        }
       }
     });
-
-    try {
-      await app.post("/files", formData);
-      console.log(formData);
-    } catch {
-      console.log("Erro: ", Error);
-    }
   };
+
+  console.log(files);
 
   return (
     <div className="flex flex-col text-lg font-semibold font-poppins space-y-5 p-2">
@@ -171,41 +160,7 @@ export function EditMarker({ closeModal, id }) {
       <div className="flex flex-col w-full space-y-2">
         <p>Uploads</p>
         <div className="flex flex-col md:flex-row w-full h-44 bg-background border border-orange rounded-lg p-2 space-y-4 md:space-y-0 md:space-x-5">
-          {/* {files.map((preview, index) => (
-            <div
-              key={index}
-              className="relative flex items-center justify-center w-full bg-background border border-orange rounded-lg p-1"
-            >
-              <input
-                type="file"
-                className="absolute inset-0 opacity-0 cursor-pointer"
-                onChange={(event) => handleFileChange(index, event)}
-              />
-              {preview ? (
-                <div className="relative w-full h-full">
-                  <img
-                    src={URL.createObjectURL(preview)}
-                    alt="Preview"
-                    className="object-cover h-full w-full rounded-lg"
-                  />
-                  <button
-                    onClick={() => handleRemoveImage(index)}
-                    className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full focus:outline-none"
-                  >
-                    <FaTrashAlt />
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center justify-center text-center w-full h-full text-gray-500">
-                  Clique para carregar um arquivo
-                </div>
-              )}
-            </div>
-          ))} */}
-          {[...Array(3)].map((_, index) => {
-            const preview =
-              files[index] ||
-              (existingFiles[index] && existingFiles[index].arquivo);
+          {files.map((file, index) => {
             return (
               <div
                 key={index}
@@ -214,21 +169,22 @@ export function EditMarker({ closeModal, id }) {
                 <input
                   type="file"
                   className="absolute inset-0 opacity-0 cursor-pointer"
-                  onChange={(event) => handleFileChange(index, event)}
+                  onChange={(e) => handleFileChange(index, e)}
                 />
-                {preview ? (
+                {file && file.arquivo ? (
                   <div className="relative w-full h-full">
                     <img
                       src={
-                        typeof preview === "string"
-                          ? preview
-                          : URL.createObjectURL(preview)
+                        typeof file.arquivo === "string"
+                          ? file.arquivo
+                          : URL.createObjectURL(file.arquivo)
                       }
                       alt="Preview"
                       className="object-cover h-full w-full rounded-lg"
                     />
+
                     <button
-                      onClick={() => handleRemoveImage(index)}
+                      onClick={() => handleRemoveFile(index)}
                       className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full focus:outline-none"
                     >
                       <FaTrashAlt />

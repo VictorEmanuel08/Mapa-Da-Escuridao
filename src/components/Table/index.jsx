@@ -5,7 +5,7 @@ import iconOn from "../../assets/iconOn.svg";
 import iconOff from "../../assets/iconOff.svg";
 import { EditMarker } from "../Modals/EditMarker";
 
-export function Table() {
+export function Table({ searchTerm }) {
   const [marcadores, setMarcadores] = useState([]);
   const [modalIsOpen, setIsOpen] = useState(false);
   const [selectedMarker, setSelectedMarker] = useState(null);
@@ -21,11 +21,13 @@ export function Table() {
   function openModal(marcador) {
     setSelectedMarker(marcador);
     setIsOpen(true);
+    setEdit(true);
   }
 
   function closeModal() {
     setIsOpen(false);
     setSelectedMarker(null);
+    setEdit(false);
   }
 
   const customStyles = {
@@ -41,6 +43,13 @@ export function Table() {
       borderRadius: "0.5rem",
     },
   };
+
+  // Filtra os marcadores com base no termo de pesquisa
+  const filteredMarkers = marcadores.filter((marcador) =>
+    marcador.bairro.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const [edit, setEdit] = useState(false);
 
   return (
     <table className="min-w-[85%]">
@@ -65,7 +74,7 @@ export function Table() {
         </tr>
       </thead>
       <tbody>
-        {marcadores.map((marcador, index) => (
+        {filteredMarkers.map((marcador, index) => (
           <tr key={index}>
             <td className="pr-2 py-2 border-b border-[#FFD180]">
               {marcador.bairro}
@@ -77,12 +86,11 @@ export function Table() {
               {marcador.numero}
             </td>
             <td className="px-2 py-2 border-b border-[#FFD180] flex justify-center">
-              {marcador.status}
-              {marcador.status === true ? (
-                <img src={iconOn} alt="icon" className="w-12" />
-              ) : (
-                <img src={iconOff} alt="icon" className="w-10" />
-              )}
+              <img
+                src={marcador.status ? iconOn : iconOff}
+                alt="icon"
+                className="w-10"
+              />
             </td>
             <td className="px-2 py-2 border-b border-[#FFD180]">
               {marcador.nome}
@@ -107,7 +115,11 @@ export function Table() {
           shouldCloseOnOverlayClick={false}
           ariaHideApp={false}
         >
-          <EditMarker closeModal={closeModal} id={selectedMarker.id_marker} />
+          <EditMarker
+            closeModal={closeModal}
+            id={selectedMarker.id_marker}
+            varEdit={edit}
+          />
         </Modal>
       )}
     </table>

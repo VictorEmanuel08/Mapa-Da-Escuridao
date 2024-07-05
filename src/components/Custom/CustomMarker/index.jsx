@@ -2,6 +2,7 @@ import React from "react";
 import { Marker } from "@react-google-maps/api";
 
 export function CustomMarker({ position, label, onClick, icon }) {
+
   return (
     <Marker
       position={position}

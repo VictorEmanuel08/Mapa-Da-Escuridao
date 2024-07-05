@@ -21,6 +21,7 @@ export function CreateMarker({ closeModal }) {
   // Função para lidar com a mudança de arquivo
   const handleFileChange = (index, event) => {
     const file = event.target.files[0];
+    console.log(file);
     if (file) {
       const newFiles = [...files];
 
