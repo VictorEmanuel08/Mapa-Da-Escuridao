@@ -13,6 +13,11 @@ export function EditMarker({ closeModal, id, varEdit }) {
   const [status, setStatus] = useState(false);
 
   const [files, setFiles] = useState([null, null, null]);
+  const [inicialFiles, setInicialFiles] = useState([]);
+
+  const [file1, setFile1] = useState(null);
+  const [file2, setFile2] = useState(null);
+  const [file3, setFile3] = useState(null);
 
   useEffect(() => {
     const getDataMarker = async () => {
@@ -31,20 +36,28 @@ export function EditMarker({ closeModal, id, varEdit }) {
         ...Array(3 - initialFiles.length).fill(null),
       ];
       setFiles(paddedFiles);
-      console.log(files);
-      getDataFiles(data.id_marker);
+      setInicialFiles(paddedFiles);
+      // getDataFiles(data.id_marker);
+
+      setFile1(data.files[0] || null);
+      setFile2(data.files[1] || null);
+      setFile3(data.files[2] || null);
     };
     getDataMarker();
   }, [id]);
 
-  const getDataFiles = async (id) => {
-    const response = await app.get(
-      `/files/110460ef-9803-433e-b5cd-b6a38d7fb4e0`
-    );
-    // const response = await app.get(`/files/${id}`);
-    const data = response.data;
-    console.log(data);
-  };
+  console.log(file1);
+  console.log(file2);
+  console.log(file3);
+
+  // const getDataFiles = async (id) => {
+  //   const response = await app.get(
+  //     `/files/110460ef-9803-433e-b5cd-b6a38d7fb4e0`
+  //   );
+  //   // const response = await app.get(`/files/${id}`);
+  //   const data = response.data;
+  //   console.log(data);
+  // };
 
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
@@ -79,29 +92,44 @@ export function EditMarker({ closeModal, id, varEdit }) {
       if (response.status === 200) {
         handleUpdateFiles();
       }
-      document.location.reload(true);
-      alert("Marcador atualizado!");
+      // document.location.reload(true);
+      // alert("Marcador atualizado!");
     } catch {
       alert("Ocorreu um erro. Tente novamente.");
     }
   };
 
   const handleUpdateFiles = async () => {
-    files.forEach(async (file) => {
-      if (file && file.arquivo) {
-        const formData = new FormData();
-        formData.append("arquivo", file.arquivo);
-
+    // Deletar todos os arquivos existentes
+    for (const file of inicialFiles) {
+      if (file && file.id) {
         try {
-          await app.put(`/files/${file.id_file}`, formData);
-        } catch {
-          console.log("Erro: ", Error);
+          const response = await app.delete(`/files/${file.id}`);
+          console.log(`Arquivo ${file.id} deletado: `, response);
+        } catch (error) {
+          console.log("Erro ao apagar arquivo: ", error);
         }
       }
-    });
-  };
+    }
 
-  console.log(files);
+    // Adicionar novos arquivos após deletar todos os antigos
+    const formData = new FormData();
+    formData.append("id_marker", id);
+
+    // Adicionar os novos arquivos se existirem
+    if (file1) formData.append("file1", file1);
+    if (file2) formData.append("file2", file2);
+    if (file3) formData.append("file3", file3);
+
+    console.log("FormData para upload: ", formData);
+
+    try {
+      const response = await app.post("/files", formData);
+      console.log("Arquivos enviados: ", response);
+    } catch (error) {
+      console.log("Erro ao enviar arquivos: ", error);
+    }
+  };
 
   return (
     <div className="flex flex-col text-lg font-semibold font-poppins space-y-5 p-2">
@@ -160,7 +188,100 @@ export function EditMarker({ closeModal, id, varEdit }) {
       <div className="flex flex-col w-full space-y-2">
         <p>Uploads</p>
         <div className="flex flex-col md:flex-row w-full h-44 bg-background border border-orange rounded-lg p-2 space-y-4 md:space-y-0 md:space-x-5">
-          {files.map((file, index) => {
+          <div className="relative flex items-center justify-center w-full bg-background border border-orange rounded-lg p-1">
+            <input
+              type="file"
+              className="absolute inset-0 opacity-0 cursor-pointer"
+              onChange={(e) => setFile1(e.target.files[0][0])}
+            />
+            {file1 && file1.arquivo ? (
+              <div className="relative w-full h-full">
+                <img
+                  src={
+                    typeof file1.arquivo === "string"
+                      ? file1.arquivo
+                      : URL.createObjectURL(file1.arquivo)
+                  }
+                  alt="Preview"
+                  className="object-cover h-full w-full rounded-lg"
+                />
+
+                <button
+                  onClick={() => setFile1(null)}
+                  className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full focus:outline-none"
+                >
+                  <FaTrashAlt />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center text-center w-full h-full text-gray-500">
+                Clique para carregar um arquivo
+              </div>
+            )}
+          </div>
+          <div className="relative flex items-center justify-center w-full bg-background border border-orange rounded-lg p-1">
+            <input
+              type="file"
+              className="absolute inset-0 opacity-0 cursor-pointer"
+              onChange={(e) => setFile2(e.target.files[0])}
+            />
+            {file2 && file2.arquivo ? (
+              <div className="relative w-full h-full">
+                <img
+                  src={
+                    typeof file2.arquivo === "string"
+                      ? file2.arquivo
+                      : URL.createObjectURL(file2.arquivo)
+                  }
+                  alt="Preview"
+                  className="object-cover h-full w-full rounded-lg"
+                />
+
+                <button
+                  onClick={() => setFile2(null)}
+                  className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full focus:outline-none"
+                >
+                  <FaTrashAlt />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center text-center w-full h-full text-gray-500">
+                Clique para carregar um arquivo
+              </div>
+            )}
+          </div>
+          <div className="relative flex items-center justify-center w-full bg-background border border-orange rounded-lg p-1">
+            <input
+              type="file"
+              className="absolute inset-0 opacity-0 cursor-pointer"
+              onChange={(e) => setFile3(e.target.files[0])}
+            />
+            {file3 && file3.arquivo ? (
+              <div className="relative w-full h-full">
+                <img
+                  src={
+                    typeof file3.arquivo === "string"
+                      ? file3.arquivo
+                      : URL.createObjectURL(file3.arquivo)
+                  }
+                  alt="Preview"
+                  className="object-cover h-full w-full rounded-lg"
+                />
+
+                <button
+                  onClick={() => setFile3(null)}
+                  className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full focus:outline-none"
+                >
+                  <FaTrashAlt />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center text-center w-full h-full text-gray-500">
+                Clique para carregar um arquivo
+              </div>
+            )}
+          </div>
+          {/* {files.map((file, index) => {
             return (
               <div
                 key={index}
@@ -197,7 +318,7 @@ export function EditMarker({ closeModal, id, varEdit }) {
                 )}
               </div>
             );
-          })}
+          })} */}
         </div>
       </div>
       <div className="flex flex-col md:flex-row items-center justify-end space-x-10">

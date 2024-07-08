@@ -21,7 +21,6 @@ export function CreateMarker({ closeModal }) {
   // Função para lidar com a mudança de arquivo
   const handleFileChange = (index, event) => {
     const file = event.target.files[0];
-    console.log(file);
     if (file) {
       const newFiles = [...files];
 
@@ -63,8 +62,8 @@ export function CreateMarker({ closeModal }) {
         handleAddFile(response.data.id_marker);
       }
       console.log(response);
-      document.location.reload(true);
-      alert("Marcador criado!");
+      // document.location.reload(true);
+      // alert("Marcador criado!");
     } catch {
       alert("Ocorreu um erro. Tente novamente.");
     }

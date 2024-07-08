@@ -1,5 +1,6 @@
 export const MapStyle = [
-  { elementType: "geometry", stylers: [{ color: "#212121" }] },
+  //base
+  { elementType: "geometry", stylers: [{ color: "#434954" }] },
   { elementType: "labels.icon", stylers: [{ visibility: "off" }] },
   { elementType: "labels.text.fill", stylers: [{ visibility: "off" }] },
   { elementType: "labels.text.stroke", stylers: [{ visibility: "off" }] },
@@ -38,25 +39,28 @@ export const MapStyle = [
     elementType: "labels.text.fill",
     stylers: [{ visibility: "off" }],
   },
+  //ruas
   {
     featureType: "road",
     elementType: "geometry.fill",
-    stylers: [{ color: "#2c2c2c" }],
+    stylers: [{ color: "#777F91" }],
   },
   {
     featureType: "road",
     elementType: "labels.text.fill",
     stylers: [{ visibility: "off" }],
   },
+  //avenidas secundárias
   {
     featureType: "road.arterial",
     elementType: "geometry",
-    stylers: [{ color: "#373737" }],
+    stylers: [{ color: "#777F91" }],
   },
+  //avenidas principais
   {
     featureType: "road.highway",
     elementType: "geometry",
-    stylers: [{ color: "#3c3c3c" }],
+    stylers: [{ color: "#777F91" }],
   },
   {
     featureType: "road.highway.controlled_access",
@@ -73,6 +77,7 @@ export const MapStyle = [
     elementType: "labels.text.fill",
     stylers: [{ visibility: "off" }],
   },
+  //água
   {
     featureType: "water",
     elementType: "geometry",
