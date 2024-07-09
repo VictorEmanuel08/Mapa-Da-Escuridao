@@ -29,6 +29,7 @@ export function EditMarker({ closeModal, id, varEdit }) {
     setFile2(data.files[1] || null);
     setFile3(data.files[2] || null);
   };
+
   useEffect(() => {
     getDataMarker(id);
   }, [id]);
@@ -69,11 +70,8 @@ export function EditMarker({ closeModal, id, varEdit }) {
         status: status,
       });
       if (response.status === 200) {
-        // handleUpdateFiles();
         handleNewFiles();
       }
-      // document.location.reload(true);
-      // alert("Marcador atualizado!");
     } catch {
       alert("Ocorreu um erro. Tente novamente.");
     }
@@ -115,11 +113,9 @@ export function EditMarker({ closeModal, id, varEdit }) {
   // };
 
   const handleNewFiles = async () => {
-    // Adicionar novos arquivos após deletar todos os antigos
     const formData = new FormData();
     formData.append("id_marker", id);
 
-    // Adicionar os novos arquivos se existirem
     if (file1) formData.append("file1", file1);
     if (file2) formData.append("file2", file2);
     if (file3) formData.append("file3", file3);
@@ -133,14 +129,18 @@ export function EditMarker({ closeModal, id, varEdit }) {
     }
   };
 
-  const handleRemoveFile = (idFile) => {
-    try {
-      const res = app.delete(`/files/${idFile}`);
-      console.log(res.data);
-      getDataMarker(id);
-    } catch (error) {
-      console.log("Erro:", error);
+  const handleRemoveFile = async (idFile, fileNumber) => {
+    if (idFile) {
+      try {
+        await app.delete(`/files/${idFile}`);
+        console.log(`Arquivo ${idFile} deletado`);
+      } catch (error) {
+        console.log("Erro:", error);
+      }
     }
+    if (fileNumber === 1) setFile1(null);
+    if (fileNumber === 2) setFile2(null);
+    if (fileNumber === 3) setFile3(null);
   };
 
   return (
@@ -216,7 +216,7 @@ export function EditMarker({ closeModal, id, varEdit }) {
                   className="object-cover h-full w-full rounded-lg"
                 />
                 <button
-                  onClick={() => handleRemoveFile(file1.id)}
+                  onClick={() => handleRemoveFile(file1.id, 1)}
                   className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full focus:outline-none"
                 >
                   <FaTrashAlt />
@@ -244,7 +244,7 @@ export function EditMarker({ closeModal, id, varEdit }) {
                   className="object-cover h-full w-full rounded-lg"
                 />
                 <button
-                  onClick={() => handleRemoveFile(file2.id)}
+                  onClick={() => handleRemoveFile(file2.id, 2)}
                   className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full focus:outline-none"
                 >
                   <FaTrashAlt />
@@ -272,7 +272,7 @@ export function EditMarker({ closeModal, id, varEdit }) {
                   className="object-cover h-full w-full rounded-lg"
                 />
                 <button
-                  onClick={() => handleRemoveFile(file3.id)}
+                  onClick={() => handleRemoveFile(file3.id, 3)}
                   className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full focus:outline-none"
                 >
                   <FaTrashAlt />
