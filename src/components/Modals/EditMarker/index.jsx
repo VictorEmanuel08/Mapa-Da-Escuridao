@@ -12,43 +12,28 @@ export function EditMarker({ closeModal, id, varEdit }) {
   const [numero, setNumero] = useState("");
   const [status, setStatus] = useState(false);
 
-  const [files, setFiles] = useState([null, null, null]);
-  const [inicialFiles, setInicialFiles] = useState([]);
-
   const [file1, setFile1] = useState(null);
   const [file2, setFile2] = useState(null);
   const [file3, setFile3] = useState(null);
 
+  const getDataMarker = async (id) => {
+    const response = await app.get(`/markers/${id}`);
+    const data = response.data;
+    setNome(data.nome || "");
+    setBairro(data.bairro || "");
+    setRua(data.rua || "");
+    setNumero(data.numero || "");
+    setStatus(data.status || false);
+    setIsChecked(data.status || false);
+    setFile1(data.files[0] || null);
+    setFile2(data.files[1] || null);
+    setFile3(data.files[2] || null);
+  };
   useEffect(() => {
-    const getDataMarker = async () => {
-      const response = await app.get(`/markers/${id}`);
-      const data = response.data;
-      setNome(data.nome || "");
-      setBairro(data.bairro || "");
-      setRua(data.rua || "");
-      setNumero(data.numero || "");
-      setStatus(data.status || false);
-      setIsChecked(data.status || false);
-      //OBRIGA O VETOR DE ARQUIVOS TER SEMPRE 3 ITENS
-      const initialFiles = data.files ? data.files.slice(0, 3) : [];
-      const paddedFiles = [
-        ...initialFiles,
-        ...Array(3 - initialFiles.length).fill(null),
-      ];
-      setFiles(paddedFiles);
-      setInicialFiles(paddedFiles);
-      // getDataFiles(data.id_marker);
-
-      setFile1(data.files[0] || null);
-      setFile2(data.files[1] || null);
-      setFile3(data.files[2] || null);
-    };
-    getDataMarker();
+    getDataMarker(id);
   }, [id]);
 
   console.log(file1);
-  console.log(file2);
-  console.log(file3);
 
   // const getDataFiles = async (id) => {
   //   const response = await app.get(
@@ -64,20 +49,14 @@ export function EditMarker({ closeModal, id, varEdit }) {
     setStatus(!isChecked);
   };
 
-  const handleFileChange = (index, e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const newFiles = [...files];
-      newFiles[index] = { ...newFiles[index], arquivo: file };
-      setFiles(newFiles);
-    }
-  };
-
-  const handleRemoveFile = (index) => {
-    const newFiles = [...files];
-    newFiles[index] = null;
-    setFiles(newFiles);
-  };
+  // const handleFileChange = (index, e) => {
+  //   const file = e.target.files[0];
+  //   if (file) {
+  //     const newFiles = [...files];
+  //     newFiles[index] = { ...newFiles[index], arquivo: file };
+  //     setFiles(newFiles);
+  //   }
+  // };
 
   const handleUpdateMarker = async () => {
     try {
@@ -90,7 +69,8 @@ export function EditMarker({ closeModal, id, varEdit }) {
         status: status,
       });
       if (response.status === 200) {
-        handleUpdateFiles();
+        // handleUpdateFiles();
+        handleNewFiles();
       }
       // document.location.reload(true);
       // alert("Marcador atualizado!");
@@ -99,19 +79,42 @@ export function EditMarker({ closeModal, id, varEdit }) {
     }
   };
 
-  const handleUpdateFiles = async () => {
-    // Deletar todos os arquivos existentes
-    for (const file of inicialFiles) {
-      if (file && file.id) {
-        try {
-          const response = await app.delete(`/files/${file.id}`);
-          console.log(`Arquivo ${file.id} deletado: `, response);
-        } catch (error) {
-          console.log("Erro ao apagar arquivo: ", error);
-        }
-      }
-    }
+  // const handleUpdateFiles = async () => {
+  //   // Deletar todos os arquivos existentes
 
+  //   for (const file of initialFiles) {
+  //     if (file && file.id) {
+  //       try {
+  //         const response = await app.delete(`/files/${file.id}`);
+  //         console.log(`Arquivo ${file.id} deletado: `, response);
+  //       } catch (error) {
+  //         console.log("Erro ao apagar arquivo: ", error);
+  //       }
+  //     }
+  //   }
+
+  //   // console.log("FormData para upload: ", formData);
+
+  //   // try {
+  //   //   if (initialFiles[0]) {
+  //   //     const response1 = await app.put(`/files/${initialFiles[0].id}`, file1);
+  //   //     console.log("Response1 ", response1);
+  //   //   }
+  //   //   if (initialFiles[1]) {
+  //   //     const response2 = await app.put(`/files/${initialFiles[1].id}`, file2);
+  //   //     console.log("Response2 ", response2);
+  //   //   }
+  //   //   if (initialFiles[2]) {
+  //   //     const response3 = await app.put(`/files/${initialFiles[2].id}`, file3);
+  //   //     console.log("Response3 ", response3);
+  //   //   }
+  //   //   // const response = await app.post("/files", formData);
+  //   // } catch (error) {
+  //   //   console.log("Erro ao enviar arquivos: ", error);
+  //   // }
+  // };
+
+  const handleNewFiles = async () => {
     // Adicionar novos arquivos após deletar todos os antigos
     const formData = new FormData();
     formData.append("id_marker", id);
@@ -121,13 +124,22 @@ export function EditMarker({ closeModal, id, varEdit }) {
     if (file2) formData.append("file2", file2);
     if (file3) formData.append("file3", file3);
 
-    console.log("FormData para upload: ", formData);
-
     try {
       const response = await app.post("/files", formData);
-      console.log("Arquivos enviados: ", response);
+      console.log(formData);
+      console.log(response.data);
+    } catch {
+      console.log("Erro: ", Error);
+    }
+  };
+
+  const handleRemoveFile = (idFile) => {
+    try {
+      const res = app.delete(`/files/${idFile}`);
+      console.log(res.data);
+      getDataMarker(id);
     } catch (error) {
-      console.log("Erro ao enviar arquivos: ", error);
+      console.log("Erro:", error);
     }
   };
 
@@ -192,22 +204,19 @@ export function EditMarker({ closeModal, id, varEdit }) {
             <input
               type="file"
               className="absolute inset-0 opacity-0 cursor-pointer"
-              onChange={(e) => setFile1(e.target.files[0][0])}
+              onChange={(e) => setFile1(e.target.files[0])}
             />
-            {file1 && file1.arquivo ? (
+            {file1 ? (
               <div className="relative w-full h-full">
                 <img
                   src={
-                    typeof file1.arquivo === "string"
-                      ? file1.arquivo
-                      : URL.createObjectURL(file1.arquivo)
+                    file1.arquivo ? file1.arquivo : URL.createObjectURL(file1)
                   }
                   alt="Preview"
                   className="object-cover h-full w-full rounded-lg"
                 />
-
                 <button
-                  onClick={() => setFile1(null)}
+                  onClick={() => handleRemoveFile(file1.id)}
                   className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full focus:outline-none"
                 >
                   <FaTrashAlt />
@@ -225,20 +234,17 @@ export function EditMarker({ closeModal, id, varEdit }) {
               className="absolute inset-0 opacity-0 cursor-pointer"
               onChange={(e) => setFile2(e.target.files[0])}
             />
-            {file2 && file2.arquivo ? (
+            {file2 ? (
               <div className="relative w-full h-full">
                 <img
                   src={
-                    typeof file2.arquivo === "string"
-                      ? file2.arquivo
-                      : URL.createObjectURL(file2.arquivo)
+                    file2.arquivo ? file2.arquivo : URL.createObjectURL(file2)
                   }
                   alt="Preview"
                   className="object-cover h-full w-full rounded-lg"
                 />
-
                 <button
-                  onClick={() => setFile2(null)}
+                  onClick={() => handleRemoveFile(file2.id)}
                   className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full focus:outline-none"
                 >
                   <FaTrashAlt />
@@ -256,20 +262,17 @@ export function EditMarker({ closeModal, id, varEdit }) {
               className="absolute inset-0 opacity-0 cursor-pointer"
               onChange={(e) => setFile3(e.target.files[0])}
             />
-            {file3 && file3.arquivo ? (
+            {file3 ? (
               <div className="relative w-full h-full">
                 <img
                   src={
-                    typeof file3.arquivo === "string"
-                      ? file3.arquivo
-                      : URL.createObjectURL(file3.arquivo)
+                    file3.arquivo ? file3.arquivo : URL.createObjectURL(file3)
                   }
                   alt="Preview"
                   className="object-cover h-full w-full rounded-lg"
                 />
-
                 <button
-                  onClick={() => setFile3(null)}
+                  onClick={() => handleRemoveFile(file3.id)}
                   className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full focus:outline-none"
                 >
                   <FaTrashAlt />
@@ -281,44 +284,6 @@ export function EditMarker({ closeModal, id, varEdit }) {
               </div>
             )}
           </div>
-          {/* {files.map((file, index) => {
-            return (
-              <div
-                key={index}
-                className="relative flex items-center justify-center w-full bg-background border border-orange rounded-lg p-1"
-              >
-                <input
-                  type="file"
-                  className="absolute inset-0 opacity-0 cursor-pointer"
-                  onChange={(e) => handleFileChange(index, e)}
-                />
-                {file && file.arquivo ? (
-                  <div className="relative w-full h-full">
-                    <img
-                      src={
-                        typeof file.arquivo === "string"
-                          ? file.arquivo
-                          : URL.createObjectURL(file.arquivo)
-                      }
-                      alt="Preview"
-                      className="object-cover h-full w-full rounded-lg"
-                    />
-
-                    <button
-                      onClick={() => handleRemoveFile(index)}
-                      className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full focus:outline-none"
-                    >
-                      <FaTrashAlt />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center text-center w-full h-full text-gray-500">
-                    Clique para carregar um arquivo
-                  </div>
-                )}
-              </div>
-            );
-          })} */}
         </div>
       </div>
       <div className="flex flex-col md:flex-row items-center justify-end space-x-10">
