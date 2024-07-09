@@ -21,13 +21,11 @@ export function Table({ searchTerm }) {
   function openModal(marcador) {
     setSelectedMarker(marcador);
     setIsOpen(true);
-    setEdit(true);
   }
 
   function closeModal() {
     setIsOpen(false);
     setSelectedMarker(null);
-    setEdit(false);
   }
 
   const customStyles = {
@@ -48,8 +46,6 @@ export function Table({ searchTerm }) {
   const filteredMarkers = marcadores.filter((marcador) =>
     marcador.bairro.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  const [edit, setEdit] = useState(false);
 
   return (
     <table className="min-w-[85%]">
@@ -118,7 +114,6 @@ export function Table({ searchTerm }) {
           <EditMarker
             closeModal={closeModal}
             id={selectedMarker.id_marker}
-            varEdit={edit}
           />
         </Modal>
       )}
