@@ -52,6 +52,11 @@ export function EditMarker({ closeModal, id }) {
       });
       if (response.status === 200) {
         handleNewFiles();
+        Toast.fire({
+          icon: "success",
+          title: "Marcador atualizado com sucesso.",
+        });
+        closeModal();
       }
     } catch {
       alert("Ocorreu um erro. Tente novamente.");
@@ -68,7 +73,7 @@ export function EditMarker({ closeModal, id }) {
     didOpen: (toast) => {
       toast.onmouseenter = Swal.stopTimer;
       toast.onmouseleave = Swal.resumeTimer;
-    }
+    },
   });
 
   const handleNewFiles = async () => {
@@ -82,32 +87,33 @@ export function EditMarker({ closeModal, id }) {
     try {
       const response = await app.post("/files", formData);
       console.log(formData);
-      Toast.fire({
-        icon: "success",
-        title: `${response?.data?.message}`
-      });
     } catch (error) {
       console.log("Erro: ", error);
       Toast.fire({
         icon: "error",
-        title: "Erro ao carregar os arquivos"
+        title: "Erro ao carregar os arquivos",
       });
     }
   };
 
-  const handleRemoveFile = async (idFile, setFile) => {
+  const handleRemoveFile = async (idFile, setFile, index) => {
     try {
-      const res = await app.delete(`/files/${idFile}`);
+      if (idFile) {
+        const res = await app.delete(`/files/${idFile}`);
+      }
       setFile(null);
+      if (index === 0) setFile1(null);
+      if (index === 1) setFile2(null);
+      if (index === 2) setFile3(null);
       Toast.fire({
         icon: "success",
-        title: "Arquivo deletado com sucesso"
+        title: "Arquivo deletado com sucesso",
       });
     } catch (error) {
       console.log("Erro:", error);
       Toast.fire({
         icon: "error",
-        title: "Erro ao deletar o arquivo"
+        title: "Erro ao deletar o arquivo",
       });
     }
   };
@@ -170,7 +176,10 @@ export function EditMarker({ closeModal, id }) {
         <p>Uploads</p>
         <div className="flex flex-col md:flex-row w-full h-44 bg-background border border-orange rounded-lg p-2 space-y-4 md:space-y-0 md:space-x-5">
           {[file1, file2, file3].map((file, index) => (
-            <div key={index} className="relative flex items-center justify-center w-full bg-background border border-orange rounded-lg p-1">
+            <div
+              key={index}
+              className="relative flex items-center justify-center w-full bg-background border border-orange rounded-lg p-1"
+            >
               <input
                 type="file"
                 className="absolute inset-0 opacity-0 cursor-pointer"
@@ -182,12 +191,20 @@ export function EditMarker({ closeModal, id }) {
               {file ? (
                 <div className="relative w-full h-full">
                   <img
-                    src={file.arquivo ? file.arquivo : URL.createObjectURL(file)}
+                    src={
+                      file.arquivo ? file.arquivo : URL.createObjectURL(file)
+                    }
                     alt="Preview"
                     className="object-cover h-full w-full rounded-lg"
                   />
                   <button
-                    onClick={() => handleRemoveFile(file.id, [setFile1, setFile2, setFile3][index])}
+                    onClick={() =>
+                      handleRemoveFile(
+                        file.id,
+                        [setFile1, setFile2, setFile3][index],
+                        index
+                      )
+                    }
                     className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full focus:outline-none"
                   >
                     <FaTrashAlt />
