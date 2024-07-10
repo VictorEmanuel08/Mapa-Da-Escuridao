@@ -156,6 +156,33 @@ export function EditMarker({ closeModal, id }) {
     });
   };
 
+  // Função para extrair a extensão do arquivo a partir da URL
+  const getFileTypeFromUrl = (url) => {
+    return url.split(".").pop().toLowerCase();
+  };
+
+  const renderPreview = (fileUrl) => {
+    const fileType = getFileTypeFromUrl(fileUrl);
+
+    if (["jpg", "jpeg", "png", "gif"].includes(fileType)) {
+      return (
+        <img
+          src={fileUrl}
+          alt="Preview"
+          className="object-cover h-full w-full rounded-lg"
+        />
+      );
+    } else if (["mp4", "webm", "ogg"].includes(fileType)) {
+      return (
+        <video className="object-cover h-full w-full rounded-lg" controls>
+          <source src={fileUrl} type={`video/${fileType}`} />
+          Your browser does not support the video tag.
+        </video>
+      );
+    } else {
+      return null;
+    }
+  };
   return (
     <div className="flex flex-col text-lg font-semibold font-poppins space-y-5 p-2">
       <div className="flex flex-col md:flex-row w-full space-y-4 md:space-y-0 md:space-x-4">
@@ -228,13 +255,17 @@ export function EditMarker({ closeModal, id }) {
               />
               {file ? (
                 <div className="relative w-full h-full">
-                  <img
+                  {console.log(file.arquivo)}
+                  {renderPreview(
+                    file.arquivo ? file.arquivo : URL.createObjectURL(file)
+                  )}
+                  {/* <img
                     src={
                       file.arquivo ? file.arquivo : URL.createObjectURL(file)
                     }
                     alt="Preview"
                     className="object-cover h-full w-full rounded-lg"
-                  />
+                  /> */}
                   <button
                     onClick={() =>
                       handleRemoveFile(

@@ -62,8 +62,8 @@ export function CreateMarker({ closeModal }) {
         handleAddFile(response.data.id_marker);
       }
       console.log(response);
-      // document.location.reload(true);
-      // alert("Marcador criado!");
+      document.location.reload(true);
+      alert("Marcador criado!");
     } catch {
       alert("Ocorreu um erro. Tente novamente.");
     }

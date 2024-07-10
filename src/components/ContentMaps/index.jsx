@@ -1,5 +1,5 @@
 import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import { MdMenu } from "react-icons/md";
 import { app } from "../../api/api";
 import { MapStyle } from "../../style/MapStyle";
@@ -16,6 +16,7 @@ export function ContentMaps() {
   const [selected, setSelected] = useState(null);
   const [filterType, setFilterType] = useState("general");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const mapRef = useRef(null); // Adicione uma referência ao mapa
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -35,9 +36,9 @@ export function ContentMaps() {
 
   const mapOptions = {
     styles: MapStyle,
-    mapTypeControl: false, // Remove o controle de alternância de Map e Satellite
-    streetViewControl: false, // Remove o boneco do Street View
-    fullscreenControl: false, // Remove o botão de tela cheia
+    mapTypeControl: false,
+    streetViewControl: false,
+    fullscreenControl: false,
   };
 
   const geocodeAddress = useCallback((address) => {
@@ -50,13 +51,13 @@ export function ContentMaps() {
             resolve({ lat: lat(), lng: lng() });
           } else {
             console.error(
-              "Geocode was not successful for the following reason: " + status
+              "Geocode não foi bem-sucedido pelo seguinte motivo: " + status
             );
             resolve(null);
           }
         });
       } else {
-        reject(new Error("Google Maps not loaded"));
+        reject(new Error("Google Maps não foi carregado"));
       }
     });
   }, []);
@@ -83,7 +84,7 @@ export function ContentMaps() {
             rua: marcador.rua,
             numero: marcador.numero,
             nome: marcador.nome,
-            files: marcador.files || [], // Certifique-se de que o objeto tenha um array de arquivos
+            files: marcador.files || [],
             status: marcador.status,
           }))
         )
@@ -97,13 +98,6 @@ export function ContentMaps() {
     setSelected(null);
   }, []);
 
-  // const getInfoWindowPosition = (position) => {
-  //   return {
-  //     lat: position.lat,
-  //     lng: position.lng,
-  //   };
-  // };
-
   const filterMarkers = (type) => {
     switch (type) {
       case "off":
@@ -112,6 +106,13 @@ export function ContentMaps() {
         return markers.filter((marker) => marker.status);
       default:
         return markers;
+    }
+  };
+
+  const resetZoom = () => {
+    if (mapRef.current) {
+      mapRef.current.setZoom(13);
+      mapRef.current.panTo(initialPosition);
     }
   };
 
@@ -137,7 +138,10 @@ export function ContentMaps() {
       <div className="z-10 absolute flex flex-row items-center justify-around w-[347px] h-[100px] top-4 right-4 bg-[#1F3241] p-4 rounded-lg shadow-lg text-[16px]">
         <button
           className="flex flex-col items-center justify-center"
-          onClick={() => setFilterType("off")}
+          onClick={() => {
+            setFilterType("off");
+            resetZoom();
+          }}
         >
           <div className="flex items-center justify-center">
             <img
@@ -150,7 +154,10 @@ export function ContentMaps() {
         </button>
         <button
           className="flex flex-col items-center justify-center"
-          onClick={() => setFilterType("general")}
+          onClick={() => {
+            setFilterType("general");
+            resetZoom();
+          }}
         >
           <div className="flex items-center justify-center">
             <img
@@ -162,8 +169,11 @@ export function ContentMaps() {
           <p>Geral</p>
         </button>
         <button
-          className="flex flex-col items-center justify-center "
-          onClick={() => setFilterType("on")}
+          className="flex flex-col items-center justify-center"
+          onClick={() => {
+            setFilterType("on");
+            resetZoom();
+          }}
         >
           <div className="flex items-center justify-center">
             <img className="w-1/2" src={iconOn} alt="Ícone Lâmpada Ligada" />
@@ -177,34 +187,18 @@ export function ContentMaps() {
         zoom={13}
         options={mapOptions}
         onClick={handleMapClick}
+        onLoad={(map) => (mapRef.current = map)} // Adicione a referência do mapa aqui
       >
         {filterMarkers(filterType).map((marker, index) => (
           <CustomMarker
             key={index}
             position={marker.position}
             label={marker.bairro}
+            zoom={13}
             onClick={() => setSelected(marker)}
             icon={marker.status ? iconOn : iconOff}
           />
         ))}
-        {/* {selected && (
-          <InfoWindow
-            position={getInfoWindowPosition(selected.position)}
-            onCloseClick={() => setSelected(null)}
-            options={{ pixelOffset: new window.google.maps.Size(0, -20) }} // Ajuste de offset vertical para posicionar o InfoWindow
-          >
-            <div
-              style={{ maxWidth: "400px" }}
-              className="flex flex-col items-center justify-start text-black p-4"
-            >
-              <h2 className="text-lg font-bold mb-2">{selected.bairro}</h2>
-              <img className="w-24 h-24 mb-2" src="/logo.png" alt="Logo" />
-              <p className="mt-0 mb-2">
-                Este é um texto que aparece ao clicar no marcador.
-              </p>
-            </div>
-          </InfoWindow>
-        )} */}
         <CustomInfoWindow selected={selected} setSelected={setSelected} />
       </GoogleMap>
     </div>
