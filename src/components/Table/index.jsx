@@ -13,7 +13,10 @@ export function Table({ searchTerm }) {
   useEffect(() => {
     const getData = async () => {
       const response = await app.get(`/markers`);
-      setMarcadores(response.data);
+      const sortedData = response.data.sort((a, b) =>
+        a.bairro.localeCompare(b.bairro)
+      );
+      setMarcadores(sortedData);
     };
     getData();
   }, []);
@@ -111,10 +114,7 @@ export function Table({ searchTerm }) {
           shouldCloseOnOverlayClick={false}
           ariaHideApp={false}
         >
-          <EditMarker
-            closeModal={closeModal}
-            id={selectedMarker.id_marker}
-          />
+          <EditMarker closeModal={closeModal} id={selectedMarker.id_marker} />
         </Modal>
       )}
     </table>

@@ -59,7 +59,7 @@ export function EditMarker({ closeModal, id }) {
         closeModal();
         setTimeout(() => {
           window.location.reload();
-        }, 1500); // 1.5 segundos
+        }, 1500);
       }
     } catch {
       alert("Ocorreu um erro. Tente novamente.");
@@ -88,8 +88,7 @@ export function EditMarker({ closeModal, id }) {
     if (file3) formData.append("file3", file3);
 
     try {
-      const response = await app.post("/files", formData);
-      console.log(formData);
+      await app.post("/files", formData);
     } catch (error) {
       console.log("Erro: ", error);
       Toast.fire({
@@ -102,7 +101,7 @@ export function EditMarker({ closeModal, id }) {
   const handleRemoveFile = async (idFile, setFile, index) => {
     try {
       if (idFile) {
-        const res = await app.delete(`/files/${idFile}`);
+        await app.delete(`/files/${idFile}`);
       }
       setFile(null);
       if (index === 0) setFile1(null);
@@ -119,6 +118,31 @@ export function EditMarker({ closeModal, id }) {
         title: "Erro ao deletar o arquivo",
       });
     }
+  };
+
+  const showConfirmationToDeleteFile = (idFile, setFile, index) => {
+    Swal.fire({
+      title: "Excluir arquivo",
+      text: "Você tem certeza que deseja excluir este arquivo? A exclusão será permanente e não poderá ser desfeita depois, mesmo que cancele a edição do marcador.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Sim",
+      cancelButtonText: "Não",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          handleRemoveFile(idFile, setFile, index);
+        } catch (error) {
+          console.log("Erro ao excluir marcador:", error);
+          Toast.fire({
+            icon: "error",
+            title: "Ocorreu um erro ao excluir o marcador. Tente novamente.",
+          });
+        }
+      }
+    });
   };
 
   const showConfirmation = () => {
@@ -183,6 +207,7 @@ export function EditMarker({ closeModal, id }) {
       return null;
     }
   };
+
   return (
     <div className="flex flex-col text-lg font-semibold font-poppins space-y-5 p-2">
       <div className="flex flex-col md:flex-row w-full space-y-4 md:space-y-0 md:space-x-4">
@@ -255,20 +280,12 @@ export function EditMarker({ closeModal, id }) {
               />
               {file ? (
                 <div className="relative w-full h-full">
-                  {console.log(file.arquivo)}
                   {renderPreview(
                     file.arquivo ? file.arquivo : URL.createObjectURL(file)
                   )}
-                  {/* <img
-                    src={
-                      file.arquivo ? file.arquivo : URL.createObjectURL(file)
-                    }
-                    alt="Preview"
-                    className="object-cover h-full w-full rounded-lg"
-                  /> */}
                   <button
                     onClick={() =>
-                      handleRemoveFile(
+                      showConfirmationToDeleteFile(
                         file.id,
                         [setFile1, setFile2, setFile3][index],
                         index

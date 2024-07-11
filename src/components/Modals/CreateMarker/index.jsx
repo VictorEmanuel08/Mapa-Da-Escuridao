@@ -3,6 +3,7 @@ import { FaTrashAlt } from "react-icons/fa";
 import iconOn from "../../../assets/iconOn.svg";
 import iconOff from "../../../assets/iconOff.svg";
 import { app } from "../../../api/api";
+import Swal from "sweetalert2";
 
 export function CreateMarker({ closeModal }) {
   const [isChecked, setIsChecked] = useState(false);
@@ -34,7 +35,6 @@ export function CreateMarker({ closeModal }) {
 
       setFiles(newFiles);
     }
-    // }
   };
 
   // Função para remover a imagem
@@ -60,10 +60,15 @@ export function CreateMarker({ closeModal }) {
       });
       if (response.status === 201) {
         handleAddFile(response.data.id_marker);
+        Toast.fire({
+          icon: "success",
+          title: "Marcador atualizado com sucesso.",
+        });
+        closeModal();
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
       }
-      console.log(response);
-      document.location.reload(true);
-      alert("Marcador criado!");
     } catch {
       alert("Ocorreu um erro. Tente novamente.");
     }
@@ -77,11 +82,23 @@ export function CreateMarker({ closeModal }) {
     formData.append("file3", files[3]);
     try {
       await app.post("/files", formData);
-      console.log(formData);
     } catch {
       console.log("Erro: ", Error);
     }
   };
+
+  //config do alert
+  const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 1500,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.onmouseenter = Swal.stopTimer;
+      toast.onmouseleave = Swal.resumeTimer;
+    },
+  });
 
   return (
     <div className="flex flex-col text-lg font-semibold font-poppins space-y-5 p-2">
