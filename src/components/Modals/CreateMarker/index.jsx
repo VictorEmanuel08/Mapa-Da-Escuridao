@@ -10,42 +10,47 @@ export function CreateMarker({ closeModal }) {
   const [telespectador, setTelespectador] = useState("");
   const [bairro, setBairro] = useState("");
   const [rua, setRua] = useState("");
-  const [num, setNum] = useState();
+  const [num, setNum] = useState("");
   const [status, setStatus] = useState(false);
   const [files, setFiles] = useState([null, null, null]);
+  const [loading, setLoading] = useState([false, false, false]);
 
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
     setStatus(!isChecked);
   };
 
-  // Função para lidar com a mudança de arquivo
   const handleFileChange = (index, event) => {
     const file = event.target.files[0];
     if (file) {
       const newFiles = [...files];
+      const newLoading = [...loading];
+      newLoading[index] = true;
+      setLoading(newLoading);
 
-      // Encontra o primeiro índice disponível (onde o valor é null)
       const firstAvailableIndex = newFiles.findIndex(
         (preview) => preview === null
       );
 
-      // Define a nova imagem no primeiro índice disponível ou no índice clicado
       newFiles[firstAvailableIndex !== -1 ? firstAvailableIndex : index] = file;
-
       setFiles(newFiles);
+
+      setTimeout(() => {
+        const updatedLoading = [...loading];
+        updatedLoading[index] = false;
+        setLoading(updatedLoading);
+      }, 1000);
     }
   };
 
-  // Função para remover a imagem
   const handleRemoveImage = (index) => {
-    // Remove a imagem do índice especificado
     const newFiles = files.filter((_, i) => i !== index);
-
-    // Adiciona null no final do array para manter o tamanho
     newFiles.push(null);
-
     setFiles(newFiles);
+
+    const newLoading = loading.filter((_, i) => i !== index);
+    newLoading.push(false);
+    setLoading(newLoading);
   };
 
   const handleAddMarker = async () => {
@@ -79,7 +84,7 @@ export function CreateMarker({ closeModal }) {
     formData.append("id_marker", id);
     formData.append("file1", files[0]);
     formData.append("file2", files[1]);
-    formData.append("file3", files[3]);
+    formData.append("file3", files[2]);
     try {
       await app.post("/files", formData);
     } catch {
@@ -87,7 +92,6 @@ export function CreateMarker({ closeModal }) {
     }
   };
 
-  //config do alert
   const Toast = Swal.mixin({
     toast: true,
     position: "top-end",
@@ -100,6 +104,28 @@ export function CreateMarker({ closeModal }) {
     },
   });
 
+  const renderPreview = (file) => {
+    const fileType = file.type.split("/")[0];
+    if (fileType === "image") {
+      return (
+        <img
+          src={URL.createObjectURL(file)}
+          alt="Preview"
+          className="object-cover h-full w-full rounded-lg"
+        />
+      );
+    } else if (fileType === "video") {
+      return (
+        <video className="object-cover h-full w-full rounded-lg" controls>
+          <source src={URL.createObjectURL(file)} type={file.type} />
+          Your browser does not support the video tag.
+        </video>
+      );
+    } else {
+      return null;
+    }
+  };
+
   return (
     <div className="flex flex-col text-lg font-semibold font-poppins space-y-5 p-2">
       <div className="flex flex-col md:flex-row w-full space-y-4 md:space-y-0 md:space-x-4">
@@ -107,18 +133,14 @@ export function CreateMarker({ closeModal }) {
           <div className="flex flex-col space-y-2">
             <p>Telespectador</p>
             <input
-              onChange={(e) => {
-                setTelespectador(e.target.value);
-              }}
+              onChange={(e) => setTelespectador(e.target.value)}
               className="w-full text-sm bg-background border border-orange rounded-lg p-1 focus:outline-none"
             />
           </div>
           <div className="flex flex-col space-y-2">
             <p>Bairro</p>
             <input
-              onChange={(e) => {
-                setBairro(e.target.value);
-              }}
+              onChange={(e) => setBairro(e.target.value)}
               className="w-full text-sm bg-background border border-orange rounded-lg p-1 focus:outline-none"
             />
           </div>
@@ -126,18 +148,14 @@ export function CreateMarker({ closeModal }) {
             <div className="w-full">
               <p>Rua</p>
               <input
-                onChange={(e) => {
-                  setRua(e.target.value);
-                }}
+                onChange={(e) => setRua(e.target.value)}
                 className="w-full text-sm bg-background border border-orange rounded-lg p-1 focus:outline-none"
               />
             </div>
             <div className="w-full">
               <p>Número</p>
               <input
-                onChange={(e) => {
-                  setNum(e.target.value);
-                }}
+                onChange={(e) => setNum(e.target.value)}
                 className="w-full text-sm bg-background border border-orange rounded-lg p-1 focus:outline-none"
               />
             </div>
@@ -161,7 +179,7 @@ export function CreateMarker({ closeModal }) {
       <div className="flex flex-col w-full space-y-2">
         <p>Uploads</p>
         <div className="flex flex-col md:flex-row w-full h-44 bg-background border border-orange rounded-lg p-2 space-y-4 md:space-y-0 md:space-x-5">
-          {files.map((preview, index) => (
+          {files.map((file, index) => (
             <div
               key={index}
               className="relative flex items-center justify-center w-full bg-background border border-orange rounded-lg p-1"
@@ -171,13 +189,13 @@ export function CreateMarker({ closeModal }) {
                 className="absolute inset-0 opacity-0 cursor-pointer"
                 onChange={(event) => handleFileChange(index, event)}
               />
-              {preview ? (
+              {loading[index] ? (
+                <div className="flex items-center justify-center text-center w-full h-full text-gray-500">
+                  Carregando...
+                </div>
+              ) : file ? (
                 <div className="relative w-full h-full">
-                  <img
-                    src={URL.createObjectURL(preview)}
-                    alt="Preview"
-                    className="object-cover h-full w-full rounded-lg"
-                  />
+                  {renderPreview(file)}
                   <button
                     onClick={() => handleRemoveImage(index)}
                     className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full focus:outline-none"

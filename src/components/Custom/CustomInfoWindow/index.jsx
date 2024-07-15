@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { InfoWindow } from "@react-google-maps/api";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
@@ -8,8 +8,8 @@ import iconOff from "../../../assets/iconOff.svg";
 
 export function CustomInfoWindow({ selected, setSelected }) {
   const [fullScreen, setFullScreen] = useState(false);
-
-  if (!selected) return null;
+  const [activeIndex, setActiveIndex] = useState(0);
+  const videoRefs = useRef([]);
 
   const getInfoWindowPosition = (position) => {
     return {
@@ -18,7 +18,7 @@ export function CustomInfoWindow({ selected, setSelected }) {
     };
   };
 
-  const renderMedia = (file, small = false) => {
+  const renderMedia = (file, small = false, index = null) => {
     const fileType = file.split(".").pop().toLowerCase();
     const mediaStyles = small
       ? "w-[120px] h-[120px] object-cover rounded-lg shadow-md"
@@ -28,7 +28,11 @@ export function CustomInfoWindow({ selected, setSelected }) {
       return <img className={mediaStyles} src={file} alt="Media" />;
     } else if (["mp4", "webm", "ogg"].includes(fileType)) {
       return (
-        <video className={mediaStyles} controls={!small} autoPlay={!small}>
+        <video
+          className={mediaStyles}
+          controls={!small}
+          ref={(el) => (videoRefs.current[index] = el)}
+        >
           <source src={file} type={`video/${fileType}`} />
           Your browser does not support the video tag.
         </video>
@@ -41,6 +45,36 @@ export function CustomInfoWindow({ selected, setSelected }) {
   const toggleFullScreen = () => {
     setFullScreen(!fullScreen);
   };
+
+  useEffect(() => {
+    if (!fullScreen) {
+      videoRefs.current.forEach((video) => {
+        if (video) {
+          video.pause();
+        }
+      });
+    }
+  }, [fullScreen]);
+
+  useEffect(() => {
+    videoRefs.current.forEach((video, index) => {
+      if (video) {
+        if (index === activeIndex && fullScreen) {
+          video.currentTime = 0;
+          const playPromise = video.play();
+          if (playPromise !== undefined) {
+            playPromise.catch((error) => {
+              console.error("Erro ao tentar carregar o vídeo:", error);
+            });
+          }
+        } else {
+          video.pause();
+        }
+      }
+    });
+  }, [activeIndex, fullScreen]);
+
+  if (!selected) return null;
 
   return (
     <>
@@ -63,6 +97,8 @@ export function CustomInfoWindow({ selected, setSelected }) {
             <Carousel
               showThumbs={false}
               className="w-full h-full flex items-center justify-center"
+              selectedItem={activeIndex}
+              onChange={(index) => setActiveIndex(index)}
             >
               {selected.files.map((file, index) => (
                 <div
@@ -70,7 +106,7 @@ export function CustomInfoWindow({ selected, setSelected }) {
                   className="w-full h-full flex items-center justify-center"
                 >
                   <div className="max-w-[600px] max-h-[600px] flex items-center justify-center">
-                    {renderMedia(file.arquivo)}
+                    {renderMedia(file.arquivo, false, index)}
                   </div>
                 </div>
               ))}
@@ -101,9 +137,7 @@ export function CustomInfoWindow({ selected, setSelected }) {
                 <p className="text-md font-medium mb-2">
                   Telespectador: {selected.nome}
                 </p>
-              ) : (
-                <></>
-              )}
+              ) : null}
             </div>
             <img
               className="w-1/6"
