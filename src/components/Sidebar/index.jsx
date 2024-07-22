@@ -7,8 +7,8 @@ export function Sidebar({ isOpen, toggleSidebar }) {
   const location = useLocation();
 
   // Verifica se a URL termina com "Markers"
-  const isMarkers = location.pathname.endsWith("Markers");
-  const isMap = location.pathname.endsWith("Maps");
+  const isMarkers = location.pathname.endsWith("MarkersEscuridao");
+  const isMap = location.pathname.endsWith("MapaEscuridao");
 
   return (
     <div
@@ -26,7 +26,10 @@ export function Sidebar({ isOpen, toggleSidebar }) {
           </div>
         </div>
         <div className="flex flex-col mt-12 space-y-8">
-          <a className="flex flex-row items-center relative" href="/Markers">
+          <a
+            className="flex flex-row items-center relative"
+            href="/MarkersEscuridao"
+          >
             {isMarkers && (
               <img src={mapSelected} className="w-1/10" alt="Aba selecionada" />
             )}
@@ -34,7 +37,10 @@ export function Sidebar({ isOpen, toggleSidebar }) {
               Marcações
             </h2>
           </a>
-          <a className="flex flex-row items-center relative" href="/Maps">
+          <a
+            className="flex flex-row items-center relative"
+            href="/MapaEscuridao"
+          >
             {isMap && (
               <img src={mapSelected} className="w-1/10" alt="Aba selecionada" />
             )}

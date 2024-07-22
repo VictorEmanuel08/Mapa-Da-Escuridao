@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import Modal from "react-modal";
 import { MdMenu } from "react-icons/md";
-import { app } from "../../api/api";
-import iconGeneral from "../../assets/iconGeneral.svg";
-import iconOn from "../../assets/iconOn.svg";
-import iconOff from "../../assets/iconOff.svg";
-import { Sidebar } from "../../components/Sidebar";
-import { CreateMarker } from "../../components/Modals/CreateMarker";
-import { Table } from "../../components/Table";
+import { app } from "../../../api/api";
+import iconGeneral from "../../../assets/iconGeneral.svg";
+import iconOn from "../../../assets/iconOn.svg";
+import iconOff from "../../../assets/iconOff.svg";
+import { Sidebar } from "../../../components/Sidebar";
+import { CreateMarker } from "../../../components/Modals/CreateMarker";
+import { Table } from "../../../components/Table";
 
-export function Markers() {
+export function MarkerEscuridao() {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [marcadores, setMarcadores] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -129,7 +129,7 @@ export function Markers() {
             onChange={(e) => setSearchTerm(e.target.value)} // Atualiza o termo de pesquisa
           />
           <div className="overflow-x-auto">
-            <Table searchTerm={searchTerm}/>
+            <Table searchTerm={searchTerm} />
           </div>
 
           <Modal
