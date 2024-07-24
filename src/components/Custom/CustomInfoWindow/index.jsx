@@ -3,8 +3,8 @@ import { InfoWindow } from "@react-google-maps/api";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { MdClose } from "react-icons/md";
-import iconOn from "../../../assets/iconOn.svg";
-import iconOff from "../../../assets/iconOff.svg";
+import iconEscuridaoOn from "../../../assets/iconEscuridaoOn.svg";
+import iconEscuridaoOff from "../../../assets/iconEscuridaoOff.svg";
 
 export function CustomInfoWindow({ selected, setSelected }) {
   const [fullScreen, setFullScreen] = useState(false);
@@ -142,7 +142,7 @@ export function CustomInfoWindow({ selected, setSelected }) {
             <img
               className="w-1/6"
               alt="Ícone de status"
-              src={selected.status ? iconOn : iconOff}
+              src={selected.status ? iconEscuridaoOn : iconEscuridaoOff}
             />
           </div>
           <div

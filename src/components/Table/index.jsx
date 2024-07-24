@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Modal from "react-modal";
 import { app } from "../../api/api";
-import iconOn from "../../assets/iconOn.svg";
-import iconOff from "../../assets/iconOff.svg";
+import iconEscuridaoOn from "../../assets/iconEscuridaoOn.svg";
+import iconEscuridaoOff from "../../assets/iconEscuridaoOff.svg";
 import { EditMarker } from "../Modals/EditMarker";
 
 export function Table({ searchTerm }) {
@@ -86,7 +86,7 @@ export function Table({ searchTerm }) {
             </td>
             <td className="px-2 py-2 border-b border-[#FFD180] flex justify-center">
               <img
-                src={marcador.status ? iconOn : iconOff}
+                src={marcador.status ? iconEscuridaoOn : iconEscuridaoOff}
                 alt="icon"
                 className="w-10"
               />

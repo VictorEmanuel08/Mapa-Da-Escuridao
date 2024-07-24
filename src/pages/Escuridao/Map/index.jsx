@@ -27,7 +27,7 @@ export function MapaEscuridao() {
 
   return (
     <div className="w-full h-screen flex justify-center items-center bg-black text-white">
-      <ContentMaps />
+      <ContentMaps marcadores={marcadores} />
     </div>
   );
 }

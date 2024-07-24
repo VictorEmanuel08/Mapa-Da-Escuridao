@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import Modal from "react-modal";
 import { MdMenu } from "react-icons/md";
 import { app } from "../../../api/api";
-import iconGeneral from "../../../assets/iconGeneral.svg";
-import iconOn from "../../../assets/iconOn.svg";
-import iconOff from "../../../assets/iconOff.svg";
+import iconEscuridaoGeneral from "../../../assets/iconEscuridaoGeneral.svg";
+import iconEscuridaoOn from "../../../assets/iconEscuridaoOn.svg";
+import iconEscuridaoOff from "../../../assets/iconEscuridaoOff.svg";
 import { Sidebar } from "../../../components/Sidebar";
 import { CreateMarker } from "../../../components/Modals/CreateMarker";
 import { Table } from "../../../components/Table";
@@ -76,7 +76,7 @@ export function MarkerEscuridao() {
                   <p className="font-bold text-2xl">{marcadores.length}</p>
                   <img
                     className="w-1/6"
-                    src={iconGeneral}
+                    src={iconEscuridaoGeneral}
                     alt="Ícone Lâmpada Parcialmente Desligada e Parcialmente Ligada"
                   />
                 </div>
@@ -92,7 +92,7 @@ export function MarkerEscuridao() {
                   </p>
                   <img
                     className="w-1/6"
-                    src={iconOn}
+                    src={iconEscuridaoOn}
                     alt="Ícone Lâmpada Ligada"
                   />
                 </div>
@@ -108,7 +108,7 @@ export function MarkerEscuridao() {
                   </p>
                   <img
                     className="w-1/6"
-                    src={iconOff}
+                    src={iconEscuridaoOff}
                     alt="Ícone Lâmpada Desligada"
                   />
                 </div>

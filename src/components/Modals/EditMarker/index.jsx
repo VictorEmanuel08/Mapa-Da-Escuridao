@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
-import iconOn from "../../../assets/iconOn.svg";
-import iconOff from "../../../assets/iconOff.svg";
+import iconEscuridaoOn from "../../../assets/iconEscuridaoOn.svg";
+import iconEscuridaoOff from "../../../assets/iconEscuridaoOff.svg";
 import { app } from "../../../api/api";
 import Swal from "sweetalert2";
 
@@ -249,7 +249,7 @@ export function EditMarker({ closeModal, id }) {
         </div>
         <div className="flex flex-col items-center justify-center w-full md:w-1/3 space-y-4">
           <img
-            src={isChecked ? iconOn : iconOff}
+            src={isChecked ? iconEscuridaoOn : iconEscuridaoOff}
             className="w-20"
             alt="Ícone de status"
           />
