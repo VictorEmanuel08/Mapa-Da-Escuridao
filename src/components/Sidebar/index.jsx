@@ -29,7 +29,7 @@ export function Sidebar({ isOpen, toggleSidebar }) {
         </div>
         <div className="flex flex-col mt-12 space-y-8">
           <a
-            className="flex flex-row items-center relative"
+            className="flex flex-row items-center relative h-4"
             href="/MarkersEscuridao"
           >
             {isMarkersEscuridao && (
@@ -40,7 +40,7 @@ export function Sidebar({ isOpen, toggleSidebar }) {
             </h2>
           </a>
           <a
-            className="flex flex-row items-center relative"
+            className="flex flex-row items-center relative h-4"
             href="/MapaEscuridao"
           >
             {isMapEscuridao && (
@@ -61,7 +61,7 @@ export function Sidebar({ isOpen, toggleSidebar }) {
         </div>
         <div className="flex flex-col mt-12 space-y-8">
           <a
-            className="flex flex-row items-center relative"
+            className="flex flex-row items-center relative h-4"
             href="/MarkersEsgoto"
           >
             {isMarkersEsgoto && (
@@ -71,7 +71,10 @@ export function Sidebar({ isOpen, toggleSidebar }) {
               Marcações
             </h2>
           </a>
-          <a className="flex flex-row items-center relative" href="/MapaEsgoto">
+          <a
+            className="flex flex-row items-center relative h-4"
+            href="/MapaEsgoto"
+          >
             {isMapEsgoto && (
               <img src={mapSelected} className="w-1/10" alt="Aba selecionada" />
             )}

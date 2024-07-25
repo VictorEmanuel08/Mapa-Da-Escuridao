@@ -1,31 +1,27 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Modal from "react-modal";
 import { MdMenu } from "react-icons/md";
-import { app } from "../../../api/api";
 import iconEscuridaoGeneral from "../../../assets/iconEscuridaoGeneral.svg";
 import iconEscuridaoOn from "../../../assets/iconEscuridaoOn.svg";
 import iconEscuridaoOff from "../../../assets/iconEscuridaoOff.svg";
+import iconEsgotoOn from "../../../assets/iconEsgotoOn.png";
+import iconEsgotoOff from "../../../assets/iconEsgotoOff.png";
+import iconEsgotoGeneral from "../../../assets/iconEscuridaoGeneral.svg";
 import { Sidebar } from "../../../components/Sidebar";
 import { CreateMarker } from "../../../components/Modals/CreateMarker";
 import { Table } from "../../../components/Table";
+import { useMapType } from "../../../hooks/UseMapType";
 
 export function MarkerEscuridao() {
   const [modalIsOpen, setIsOpen] = useState(false);
-  const [marcadores, setMarcadores] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState(""); // Estado para o termo de pesquisa
+
+  const { marcadores, isMarkerEscuridao } = useMapType();
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
-
-  useEffect(() => {
-    const getData = async () => {
-      const response = await app.get(`/markers`);
-      setMarcadores(response.data);
-    };
-    getData();
-  }, []);
 
   function openModal() {
     setIsOpen(true);
@@ -48,6 +44,15 @@ export function MarkerEscuridao() {
       borderRadius: "0.5rem",
     },
   };
+
+  // Defina os ícones com base na URL
+  const iconOn = isMarkerEscuridao ? iconEscuridaoOn : iconEsgotoOn;
+  const textOn = isMarkerEscuridao ? "com Luz" : "sem problemas";
+  const iconOff = isMarkerEscuridao ? iconEscuridaoOff : iconEsgotoOff;
+  const textOff = isMarkerEscuridao ? "sem Luz" : "com problemas";
+  const iconGeneral = isMarkerEscuridao
+    ? iconEscuridaoGeneral
+    : iconEsgotoGeneral;
 
   return (
     <div className="relative w-full h-screen bg-background overflow-x-hidden font-poppins">
@@ -76,7 +81,7 @@ export function MarkerEscuridao() {
                   <p className="font-bold text-2xl">{marcadores.length}</p>
                   <img
                     className="w-1/6"
-                    src={iconEscuridaoGeneral}
+                    src={iconGeneral}
                     alt="Ícone Lâmpada Parcialmente Desligada e Parcialmente Ligada"
                   />
                 </div>
@@ -92,11 +97,11 @@ export function MarkerEscuridao() {
                   </p>
                   <img
                     className="w-1/6"
-                    src={iconEscuridaoOn}
+                    src={iconOn}
                     alt="Ícone Lâmpada Ligada"
                   />
                 </div>
-                <p className="font-normal text-lg">Bairros com luz</p>
+                <p className="font-normal text-lg">Bairros {textOn}</p>
               </div>
               <div className="flex flex-col max-w-[30%] border border-[#FFA300] rounded-lg p-3">
                 <div className="flex flex-row items-center space-x-4">
@@ -108,11 +113,11 @@ export function MarkerEscuridao() {
                   </p>
                   <img
                     className="w-1/6"
-                    src={iconEscuridaoOff}
+                    src={iconOff}
                     alt="Ícone Lâmpada Desligada"
                   />
                 </div>
-                <p className="font-normal text-lg">Bairros sem luz</p>
+                <p className="font-normal text-lg">Bairros {textOff}</p>
               </div>
             </div>
             <button
@@ -129,7 +134,10 @@ export function MarkerEscuridao() {
             onChange={(e) => setSearchTerm(e.target.value)} // Atualiza o termo de pesquisa
           />
           <div className="overflow-x-auto">
-            <Table searchTerm={searchTerm} />
+            <Table
+              searchTerm={searchTerm}
+              isMarkerEscuridao={isMarkerEscuridao}
+            />
           </div>
 
           <Modal
@@ -140,7 +148,10 @@ export function MarkerEscuridao() {
             shouldCloseOnOverlayClick={false}
             ariaHideApp={false}
           >
-            <CreateMarker closeModal={closeModal} />
+            <CreateMarker
+              closeModal={closeModal}
+              isMarkerEscuridao={isMarkerEscuridao}
+            />
           </Modal>
         </div>
       </div>

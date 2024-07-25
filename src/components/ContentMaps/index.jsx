@@ -11,27 +11,25 @@ import iconEsgotoGeneral from "../../assets/iconEscuridaoGeneral.svg";
 import { Sidebar } from "../Sidebar";
 import { CustomMarker } from "../Custom/CustomMarker";
 import { CustomInfoWindow } from "../Custom/CustomInfoWindow";
-import { useLocation } from "react-router-dom";
+import { useMapType } from "../../hooks/UseMapType";
 
 export function ContentMaps({ marcadores }) {
-  // const [marcadores, setMarcadores] = useState([]);
   const [markers, setMarkers] = useState([]);
   const [selected, setSelected] = useState(null);
   const [filterType, setFilterType] = useState("general");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const mapRef = useRef(null); // Adicione uma referência ao mapa
 
-  const location = useLocation();
-  // Verifica se a URL termina com "MapaEsgoto" ou "MapaEscuridao"
-  const isEsgoto = location.pathname.endsWith("MapaEsgoto");
-  const isEscuridao = location.pathname.endsWith("MapaEscuridao");
+  const { isMapaEscuridao } = useMapType();
 
   // Defina os ícones com base na URL
-  const iconOn = isEscuridao ? iconEscuridaoOn : iconEsgotoOn;
-  const textOn = isEscuridao ? "Com Luz" : "Sem problemas";
-  const iconOff = isEscuridao ? iconEscuridaoOff : iconEsgotoOff;
-  const textOff = isEscuridao ? "Sem Luz" : "Com problemas";
-  const iconGeneral = isEscuridao ? iconEscuridaoGeneral : null; // Se não precisar de ícone geral para esgoto
+  const iconOn = isMapaEscuridao ? iconEscuridaoOn : iconEsgotoOn;
+  const textOn = isMapaEscuridao ? "Com Luz" : "Sem problemas";
+  const iconOff = isMapaEscuridao ? iconEscuridaoOff : iconEsgotoOff;
+  const textOff = isMapaEscuridao ? "Sem Luz" : "Com problemas";
+  const iconGeneral = isMapaEscuridao
+    ? iconEscuridaoGeneral
+    : iconEsgotoGeneral;
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);

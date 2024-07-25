@@ -5,21 +5,26 @@ import iconEscuridaoOn from "../../assets/iconEscuridaoOn.svg";
 import iconEscuridaoOff from "../../assets/iconEscuridaoOff.svg";
 import { EditMarker } from "../Modals/EditMarker";
 
-export function Table({ searchTerm }) {
+export function Table({ searchTerm, isMarkerEscuridao }) {
   const [marcadores, setMarcadores] = useState([]);
   const [modalIsOpen, setIsOpen] = useState(false);
   const [selectedMarker, setSelectedMarker] = useState(null);
 
   useEffect(() => {
     const getData = async () => {
-      const response = await app.get(`/markers`);
+      let response;
+      if (isMarkerEscuridao) {
+        response = await app.get(`/markers`);
+      } else if (!isMarkerEscuridao) {
+        response = await app.get(`/esgotos`);
+      }
       const sortedData = response.data.sort((a, b) =>
         a.bairro.localeCompare(b.bairro)
       );
       setMarcadores(sortedData);
     };
     getData();
-  }, []);
+  }, [isMarkerEscuridao]);
 
   function openModal(marcador) {
     setSelectedMarker(marcador);
