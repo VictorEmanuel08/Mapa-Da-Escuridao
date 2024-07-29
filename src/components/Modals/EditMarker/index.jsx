@@ -5,7 +5,7 @@ import iconEscuridaoOff from "../../../assets/iconEscuridaoOff.svg";
 import { app } from "../../../api/api";
 import Swal from "sweetalert2";
 
-export function EditMarker({ closeModal, id }) {
+export function EditMarker({ closeModal, id, isMarkerEscuridao }) {
   const [isChecked, setIsChecked] = useState(false);
   const [nome, setNome] = useState("");
   const [bairro, setBairro] = useState("");
@@ -18,22 +18,27 @@ export function EditMarker({ closeModal, id }) {
   const [file3, setFile3] = useState(null);
 
   const getDataMarker = async (id) => {
-    const response = await app.get(`/markers/${id}`);
-    const data = response.data;
-    setNome(data.nome || "");
-    setBairro(data.bairro || "");
-    setRua(data.rua || "");
-    setNumero(data.numero || "");
-    setStatus(data.status || false);
-    setIsChecked(data.status || false);
-    setFile1(data.files[0] || null);
-    setFile2(data.files[1] || null);
-    setFile3(data.files[2] || null);
+    const endpoint = isMarkerEscuridao ? `/markers/${id}` : `/esgotos/${id}`;
+    try {
+      const response = await app.get(endpoint);
+      const data = response.data;
+      setNome(data.nome || "");
+      setBairro(data.bairro || "");
+      setRua(data.rua || "");
+      setNumero(data.numero || "");
+      setStatus(data.status || false);
+      setIsChecked(data.status || false);
+      setFile1(data.files ? data.files[0] : null);
+      setFile2(data.files ? data.files[1] : null);
+      setFile3(data.files ? data.files[2] : null);
+    } catch (error) {
+      console.error("Erro ao buscar dados do marcador:", error);
+    }
   };
 
   useEffect(() => {
     getDataMarker(id);
-  }, [id]);
+  }, [id, isMarkerEscuridao]);
 
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
@@ -41,8 +46,9 @@ export function EditMarker({ closeModal, id }) {
   };
 
   const handleUpdateMarker = async () => {
+    const endpoint = isMarkerEscuridao ? `/markers/${id}` : `/esgotos/${id}`;
     try {
-      const response = await app.put(`/markers/${id}`, {
+      const response = await app.put(endpoint, {
         nome,
         rua,
         bairro,
@@ -61,8 +67,12 @@ export function EditMarker({ closeModal, id }) {
           window.location.reload();
         }, 1500);
       }
-    } catch {
-      alert("Ocorreu um erro. Tente novamente.");
+    } catch (error) {
+      console.error("Erro ao atualizar marcador:", error);
+      Toast.fire({
+        icon: "error",
+        title: "Ocorreu um erro. Tente novamente.",
+      });
     }
   };
 
@@ -80,17 +90,19 @@ export function EditMarker({ closeModal, id }) {
   });
 
   const handleNewFiles = async () => {
+    const typeFormData = isMarkerEscuridao ? "id_marker" : "id_esgoto";
     const formData = new FormData();
-    formData.append("id_marker", id);
+    formData.append(typeFormData, id);
 
     if (file1) formData.append("file1", file1);
     if (file2) formData.append("file2", file2);
     if (file3) formData.append("file3", file3);
 
     try {
-      await app.post("/files", formData);
+      const endpoint = isMarkerEscuridao ? "/files" : "/filesEsgoto";
+      await app.post(endpoint, formData);
     } catch (error) {
-      console.log("Erro: ", error);
+      console.error("Erro ao carregar arquivos:", error);
       Toast.fire({
         icon: "error",
         title: "Erro ao carregar os arquivos",
@@ -100,8 +112,9 @@ export function EditMarker({ closeModal, id }) {
 
   const handleRemoveFile = async (idFile, setFile, index) => {
     try {
+      const endpoint = isMarkerEscuridao ? "/files" : "/filesEsgoto";
       if (idFile) {
-        await app.delete(`/files/${idFile}`);
+        await app.delete(`${endpoint}/${idFile}`);
       }
       setFile(null);
       if (index === 0) setFile1(null);
@@ -112,7 +125,7 @@ export function EditMarker({ closeModal, id }) {
         title: "Arquivo deletado com sucesso",
       });
     } catch (error) {
-      console.log("Erro:", error);
+      console.error("Erro ao deletar arquivo:", error);
       Toast.fire({
         icon: "error",
         title: "Erro ao deletar o arquivo",
@@ -135,10 +148,10 @@ export function EditMarker({ closeModal, id }) {
         try {
           handleRemoveFile(idFile, setFile, index);
         } catch (error) {
-          console.log("Erro ao excluir marcador:", error);
+          console.error("Erro ao excluir arquivo:", error);
           Toast.fire({
             icon: "error",
-            title: "Ocorreu um erro ao excluir o marcador. Tente novamente.",
+            title: "Ocorreu um erro ao excluir o arquivo. Tente novamente.",
           });
         }
       }
@@ -157,8 +170,11 @@ export function EditMarker({ closeModal, id }) {
       cancelButtonText: "Não",
     }).then(async (result) => {
       if (result.isConfirmed) {
+        const endpoint = isMarkerEscuridao
+          ? `/markers/${id}`
+          : `/esgotos/${id}`;
         try {
-          const response = await app.delete(`/markers/${id}`);
+          const response = await app.delete(endpoint);
           if (response.status === 204) {
             Toast.fire({
               icon: "success",
@@ -170,7 +186,7 @@ export function EditMarker({ closeModal, id }) {
             }, 1500); // 1.5 segundos
           }
         } catch (error) {
-          console.log("Erro ao excluir marcador:", error);
+          console.error("Erro ao excluir marcador:", error);
           Toast.fire({
             icon: "error",
             title: "Ocorreu um erro ao excluir o marcador. Tente novamente.",

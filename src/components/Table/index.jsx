@@ -119,7 +119,15 @@ export function Table({ searchTerm, isMarkerEscuridao }) {
           shouldCloseOnOverlayClick={false}
           ariaHideApp={false}
         >
-          <EditMarker closeModal={closeModal} id={selectedMarker.id_marker} />
+          <EditMarker
+            isMarkerEscuridao={isMarkerEscuridao}
+            closeModal={closeModal}
+            id={
+              isMarkerEscuridao
+                ? selectedMarker.id_marker
+                : selectedMarker.id_esgoto
+            }
+          />
         </Modal>
       )}
     </table>

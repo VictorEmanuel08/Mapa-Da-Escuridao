@@ -5,7 +5,7 @@ import iconEscuridaoOff from "../../../assets/iconEscuridaoOff.svg";
 import { app } from "../../../api/api";
 import Swal from "sweetalert2";
 
-export function CreateMarker({ closeModal }) {
+export function CreateMarker({ closeModal, isMarkerEscuridao }) {
   const [isChecked, setIsChecked] = useState(false);
   const [telespectador, setTelespectador] = useState("");
   const [bairro, setBairro] = useState("");
@@ -55,14 +55,26 @@ export function CreateMarker({ closeModal }) {
 
   const handleAddMarker = async () => {
     try {
-      const response = await app.post("/markers", {
-        nome: telespectador,
-        rua: rua,
-        bairro: bairro,
-        numero: num,
-        cidade: "São Luís",
-        status: status,
-      });
+      let response;
+      if (isMarkerEscuridao) {
+        response = await app.post("/markers", {
+          nome: telespectador,
+          rua: rua,
+          bairro: bairro,
+          numero: num,
+          cidade: "São Luís",
+          status: status,
+        });
+      } else if (!isMarkerEscuridao) {
+        response = await app.post("/esgotos", {
+          nome: telespectador,
+          rua: rua,
+          bairro: bairro,
+          numero: num,
+          cidade: "São Luís",
+          status: status,
+        });
+      }
       if (response.status === 201) {
         handleAddFile(response.data.id_marker);
         Toast.fire({
@@ -85,10 +97,18 @@ export function CreateMarker({ closeModal }) {
     formData.append("file1", files[0]);
     formData.append("file2", files[1]);
     formData.append("file3", files[2]);
-    try {
-      await app.post("/files", formData);
-    } catch {
-      console.log("Erro: ", Error);
+    if (isMarkerEscuridao) {
+      try {
+        await app.post("/files", formData);
+      } catch {
+        console.log("Erro: ", Error);
+      }
+    } else if (isMarkerEscuridao) {
+      try {
+        await app.post("/filesEsgoto", formData);
+      } catch {
+        console.log("Erro: ", Error);
+      }
     }
   };
 
