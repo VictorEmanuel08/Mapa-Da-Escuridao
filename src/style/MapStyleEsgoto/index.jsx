@@ -1,91 +1,70 @@
-export const MapStyle = [
-  //base
-  { elementType: "geometry", stylers: [{ color: "#434954" }] },
-  { elementType: "labels.icon", stylers: [{ visibility: "off" }] },
-  { elementType: "labels.text.fill", stylers: [{ visibility: "off" }] },
-  { elementType: "labels.text.stroke", stylers: [{ visibility: "off" }] },
+export const MapStyleEsgoto = [
+  // Ocultando ícones de rótulos
+  { elementType: "labels.icon", stylers: [{ visibility: "off" }] }, // Remove os ícones dos rótulos
+  { elementType: "labels.text.fill", stylers: [{ visibility: "off" }] }, // Remove o texto dos rótulos
+  { elementType: "labels.text.stroke", stylers: [{ visibility: "off" }] }, // Remove o contorno do texto dos rótulos
+
+  // Ocultando rótulos administrativos
   {
     featureType: "administrative",
     elementType: "geometry",
     stylers: [{ visibility: "off" }],
-  },
+  }, // Remove a geometria das áreas administrativas
   {
     featureType: "administrative.country",
     elementType: "labels.text.fill",
     stylers: [{ visibility: "off" }],
-  },
+  }, // Remove o texto dos rótulos de países
   {
     featureType: "administrative.land_parcel",
     stylers: [{ visibility: "off" }],
-  },
+  }, // Remove os rótulos de parcelas de terra
   {
     featureType: "administrative.locality",
     elementType: "labels.text.fill",
     stylers: [{ visibility: "off" }],
-  },
+  }, // Remove o texto dos rótulos de localidades
+
+  // Ocultando pontos de interesse (POI)
   {
     featureType: "poi",
     elementType: "labels.text.fill",
     stylers: [{ visibility: "off" }],
-  },
+  }, // Remove o texto dos rótulos de pontos de interesse
   {
     featureType: "poi.park",
     elementType: "geometry",
     stylers: [{ visibility: "off" }],
-    // stylers: [{ color: "#181818" }],
-  },
+  }, // Remove a geometria dos parques
   {
     featureType: "poi.park",
     elementType: "labels.text.fill",
     stylers: [{ visibility: "off" }],
-  },
-  //ruas
-  {
-    featureType: "road",
-    elementType: "geometry.fill",
-    stylers: [{ color: "#777F91" }],
-  },
+  }, // Remove o texto dos rótulos de parques
+
+  // Ocultando rótulos de ruas
   {
     featureType: "road",
     elementType: "labels.text.fill",
     stylers: [{ visibility: "off" }],
-  },
-  //avenidas secundárias
-  {
-    featureType: "road.arterial",
-    elementType: "geometry",
-    stylers: [{ color: "#777F91" }],
-  },
-  //avenidas principais
-  {
-    featureType: "road.highway",
-    elementType: "geometry",
-    stylers: [{ color: "#777F91" }],
-  },
-  {
-    featureType: "road.highway.controlled_access",
-    elementType: "geometry",
-    stylers: [{ color: "#4e4e4e" }],
-  },
+  }, // Remove o texto dos rótulos de ruas
   {
     featureType: "road.local",
     elementType: "labels.text.fill",
     stylers: [{ visibility: "off" }],
-  },
+  }, // Remove o texto dos rótulos de ruas locais
+
+  // Ocultando rótulos de trânsito
   {
     featureType: "transit",
     elementType: "labels.text.fill",
     stylers: [{ visibility: "off" }],
-  },
-  //água
-  {
-    featureType: "water",
-    elementType: "geometry",
-    stylers: [{ color: "#000000" }],
-  },
+  }, // Remove o texto dos rótulos de trânsito
+
+  // Ocultando rótulos de água
   {
     featureType: "water",
     elementType: "labels.text.fill",
     stylers: [{ visibility: "off" }],
-  },
+  }, // Remove o texto dos rótulos de áreas de água
 ];

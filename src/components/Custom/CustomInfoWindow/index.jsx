@@ -5,8 +5,10 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { MdClose } from "react-icons/md";
 import iconEscuridaoOn from "../../../assets/iconEscuridaoOn.svg";
 import iconEscuridaoOff from "../../../assets/iconEscuridaoOff.svg";
+import iconEsgotoOn from "../../../assets/iconEsgotoOn.png";
+import iconEsgotoOff from "../../../assets/iconEsgotoOff.png";
 
-export function CustomInfoWindow({ selected, setSelected }) {
+export function CustomInfoWindow({ selected, setSelected, isMapaEscuridao }) {
   const [fullScreen, setFullScreen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const videoRefs = useRef([]);
@@ -142,7 +144,15 @@ export function CustomInfoWindow({ selected, setSelected }) {
             <img
               className="w-1/6"
               alt="Ícone de status"
-              src={selected.status ? iconEscuridaoOn : iconEscuridaoOff}
+              src={
+                isMapaEscuridao
+                  ? selected.status
+                    ? iconEscuridaoOn
+                    : iconEscuridaoOff
+                  : selected.status
+                  ? iconEsgotoOn
+                  : iconEsgotoOff
+              }
             />
           </div>
           <div

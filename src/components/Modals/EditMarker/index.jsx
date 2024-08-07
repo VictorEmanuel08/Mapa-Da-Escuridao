@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import iconEscuridaoOn from "../../../assets/iconEscuridaoOn.svg";
 import iconEscuridaoOff from "../../../assets/iconEscuridaoOff.svg";
+import iconEsgotoOn from "../../../assets/iconEsgotoOn.png";
+import iconEsgotoOff from "../../../assets/iconEsgotoOff.png";
 import { app } from "../../../api/api";
 import Swal from "sweetalert2";
 
@@ -17,28 +19,31 @@ export function EditMarker({ closeModal, id, isMarkerEscuridao }) {
   const [file2, setFile2] = useState(null);
   const [file3, setFile3] = useState(null);
 
-  const getDataMarker = async (id) => {
-    const endpoint = isMarkerEscuridao ? `/markers/${id}` : `/esgotos/${id}`;
-    try {
-      const response = await app.get(endpoint);
-      const data = response.data;
-      setNome(data.nome || "");
-      setBairro(data.bairro || "");
-      setRua(data.rua || "");
-      setNumero(data.numero || "");
-      setStatus(data.status || false);
-      setIsChecked(data.status || false);
-      setFile1(data.files ? data.files[0] : null);
-      setFile2(data.files ? data.files[1] : null);
-      setFile3(data.files ? data.files[2] : null);
-    } catch (error) {
-      console.error("Erro ao buscar dados do marcador:", error);
-    }
-  };
+  const getDataMarker = useCallback(
+    async (id) => {
+      const endpoint = isMarkerEscuridao ? `/markers/${id}` : `/esgotos/${id}`;
+      try {
+        const response = await app.get(endpoint);
+        const data = response.data;
+        setNome(data.nome || "");
+        setBairro(data.bairro || "");
+        setRua(data.rua || "");
+        setNumero(data.numero || "");
+        setStatus(data.status || false);
+        setIsChecked(data.status || false);
+        setFile1(data.files ? data.files[0] : null);
+        setFile2(data.files ? data.files[1] : null);
+        setFile3(data.files ? data.files[2] : null);
+      } catch (error) {
+        console.error("Erro ao buscar dados do marcador:", error);
+      }
+    },
+    [isMarkerEscuridao]
+  );
 
   useEffect(() => {
     getDataMarker(id);
-  }, [id, isMarkerEscuridao]);
+  }, [getDataMarker, id]);
 
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
@@ -111,6 +116,7 @@ export function EditMarker({ closeModal, id, isMarkerEscuridao }) {
   };
 
   const handleRemoveFile = async (idFile, setFile, index) => {
+    console.log(idFile);
     try {
       const endpoint = isMarkerEscuridao ? "/files" : "/filesEsgoto";
       if (idFile) {
@@ -264,11 +270,19 @@ export function EditMarker({ closeModal, id, isMarkerEscuridao }) {
           </div>
         </div>
         <div className="flex flex-col items-center justify-center w-full md:w-1/3 space-y-4">
-          <img
-            src={isChecked ? iconEscuridaoOn : iconEscuridaoOff}
-            className="w-20"
-            alt="Ícone de status"
-          />
+          {isMarkerEscuridao ? (
+            <img
+              src={isChecked ? iconEscuridaoOn : iconEscuridaoOff}
+              className="w-20"
+              alt="Ícone de status"
+            />
+          ) : (
+            <img
+              src={isChecked ? iconEsgotoOn : iconEsgotoOff}
+              className="w-20"
+              alt="Ícone de status"
+            />
+          )}
           <p>Status</p>
           <input
             type="checkbox"

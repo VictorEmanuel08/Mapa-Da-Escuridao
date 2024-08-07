@@ -1,5 +1,5 @@
-import { ContentMaps } from "../../../components/ContentMaps";
-import { useMapType } from "../../../hooks/UseMapType";
+import { ContentMaps } from "../../components/ContentMaps";
+import { useMapType } from "../../hooks/UseMapType";
 
 export function MapaEscuridao() {
   const { marcadores } = useMapType();

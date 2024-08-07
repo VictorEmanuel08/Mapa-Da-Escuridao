@@ -3,6 +3,8 @@ import Modal from "react-modal";
 import { app } from "../../api/api";
 import iconEscuridaoOn from "../../assets/iconEscuridaoOn.svg";
 import iconEscuridaoOff from "../../assets/iconEscuridaoOff.svg";
+import iconEsgotoOn from "../../assets/iconEsgotoOn.png";
+import iconEsgotoOff from "../../assets/iconEsgotoOff.png";
 import { EditMarker } from "../Modals/EditMarker";
 
 export function Table({ searchTerm, isMarkerEscuridao }) {
@@ -42,7 +44,6 @@ export function Table({ searchTerm, isMarkerEscuridao }) {
       left: "50%",
       right: "auto",
       bottom: "auto",
-      // marginRight: "-50%",
       transform: "translate(-50%, -50%)",
       width: "40%",
       height: "75%",
@@ -90,11 +91,19 @@ export function Table({ searchTerm, isMarkerEscuridao }) {
               {marcador.numero}
             </td>
             <td className="px-2 py-2 border-b border-[#FFD180] flex justify-center">
-              <img
-                src={marcador.status ? iconEscuridaoOn : iconEscuridaoOff}
-                alt="icon"
-                className="w-10"
-              />
+              {isMarkerEscuridao ? (
+                <img
+                  src={marcador.status ? iconEscuridaoOn : iconEscuridaoOff}
+                  alt="icon"
+                  className="w-10"
+                />
+              ) : (
+                <img
+                  src={marcador.status ? iconEsgotoOn : iconEsgotoOff}
+                  alt="icon"
+                  className="w-10"
+                />
+              )}
             </td>
             <td className="px-2 py-2 border-b border-[#FFD180]">
               {marcador.nome}

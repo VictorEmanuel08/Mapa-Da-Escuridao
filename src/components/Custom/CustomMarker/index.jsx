@@ -8,10 +8,11 @@ export function CustomMarker({ position, label, onClick, icon }) {
       options={{
         label: {
           text: label,
-          className: "m-[-50px]",
+          className:
+            "m-[-50px] px-1 bg-gray-500 rounded border border-gray-700 font-bold ",
           color: "white",
-          fontWeight: "bold",
           fontSize: "1.15rem",
+          fontFamily: "poppins, sans-serif", // Adiciona a fonte Roboto
         },
         icon: {
           url: icon,

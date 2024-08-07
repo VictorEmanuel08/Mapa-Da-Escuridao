@@ -1,28 +1,33 @@
+// Importa os componentes e bibliotecas necessários
 import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import { MdMenu } from "react-icons/md";
-import { MapStyle } from "../../style/MapStyle";
+import { MapStyleEscuridao } from "../../style/MapStyleEscuridao";
+import { MapStyleEsgoto } from "../../style/MapStyleEsgoto";
+import { Sidebar } from "../Sidebar";
+import { CustomMarker } from "../Custom/CustomMarker";
+import { CustomInfoWindow } from "../Custom/CustomInfoWindow";
+import { useMapType } from "../../hooks/UseMapType"; //importação do tipo de mapa baseado na URL. Verificar como funciona o hook
 import iconEscuridaoGeneral from "../../assets/iconEscuridaoGeneral.svg";
 import iconEscuridaoOn from "../../assets/iconEscuridaoOn.svg";
 import iconEscuridaoOff from "../../assets/iconEscuridaoOff.svg";
 import iconEsgotoOn from "../../assets/iconEsgotoOn.png";
 import iconEsgotoOff from "../../assets/iconEsgotoOff.png";
-import iconEsgotoGeneral from "../../assets/iconEscuridaoGeneral.svg";
-import { Sidebar } from "../Sidebar";
-import { CustomMarker } from "../Custom/CustomMarker";
-import { CustomInfoWindow } from "../Custom/CustomInfoWindow";
-import { useMapType } from "../../hooks/UseMapType";
+import iconEsgotoGeneral from "../../assets/iconEsgotoGeneral.png";
 
+// Define o componente ContentMaps, que recebe a lista de marcadores como props
 export function ContentMaps({ marcadores }) {
+  // Declara estados para gerenciar marcadores, seleção de marcador, filtro e estado da barra lateral
   const [markers, setMarkers] = useState([]);
   const [selected, setSelected] = useState(null);
   const [filterType, setFilterType] = useState("general");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const mapRef = useRef(null); // Adicione uma referência ao mapa
+  const mapRef = useRef(null);
 
+  // Hook personalizado para determinar o estilo do mapa com base no tipo
   const { isMapaEscuridao } = useMapType();
 
-  // Defina os ícones com base na URL
+  // Define os ícones e textos com base no tipo de mapa (Escuridao ou Esgoto)
   const iconOn = isMapaEscuridao ? iconEscuridaoOn : iconEsgotoOn;
   const textOn = isMapaEscuridao ? "Com Luz" : "Sem problemas";
   const iconOff = isMapaEscuridao ? iconEscuridaoOff : iconEsgotoOff;
@@ -31,29 +36,35 @@ export function ContentMaps({ marcadores }) {
     ? iconEscuridaoGeneral
     : iconEsgotoGeneral;
 
+  // Função para alternar a visibilidade da barra lateral
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  // Obtém a chave da API do Google Maps do ambiente
   const apiKey = process.env.REACT_APP_API_KEY_MAPS;
 
+  // Hook para carregar a API do Google Maps
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: apiKey,
   });
 
+  // Define a posição inicial do mapa
   const initialPosition = {
     lat: -2.52997716338038,
     lng: -44.23187759309891,
   };
 
+  // Define as opções do mapa, incluindo estilos e controles
   const mapOptions = {
-    styles: MapStyle,
+    styles: isMapaEscuridao ? MapStyleEscuridao : MapStyleEsgoto,
     mapTypeControl: false,
     streetViewControl: false,
     fullscreenControl: false,
   };
 
+  // Função para geocodificar um endereço e retornar a posição (latitude e longitude)
   const geocodeAddress = useCallback((address) => {
     return new Promise((resolve, reject) => {
       if (window.google && window.google.maps) {
@@ -75,6 +86,7 @@ export function ContentMaps({ marcadores }) {
     });
   }, []);
 
+  // Hook para atualizar os marcadores quando a API do Google Maps é carregada e a lista de marcadores é alterada
   useEffect(() => {
     if (isLoaded && marcadores && marcadores.length > 0) {
       Promise.all(
@@ -99,10 +111,12 @@ export function ContentMaps({ marcadores }) {
     }
   }, [isLoaded, geocodeAddress, marcadores]);
 
+  // Função para definir a seleção de marcador como nula quando o mapa é clicado
   const handleMapClick = useCallback(() => {
     setSelected(null);
   }, []);
 
+  // Função para filtrar os marcadores com base no tipo de filtro selecionado
   const filterMarkers = (type) => {
     switch (type) {
       case "off":
@@ -114,6 +128,7 @@ export function ContentMaps({ marcadores }) {
     }
   };
 
+  // Função para redefinir o zoom e a posição do mapa para a posição inicial
   const resetZoom = () => {
     if (mapRef.current) {
       mapRef.current.setZoom(13);
@@ -121,11 +136,15 @@ export function ContentMaps({ marcadores }) {
     }
   };
 
+  // Exibe uma mensagem de carregamento se o Google Maps ainda não foi carregado
   if (!isLoaded) return <div>Loading...</div>;
 
   return (
     <div className="relative w-full h-screen bg-background overflow-x-hidden font-poppins">
+      {/* Componente Sidebar para navegação lateral */}
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+
+      {/* Botão para abrir/fechar a barra lateral */}
       <div
         className={`absolute z-10 transform ${
           isSidebarOpen ? "translate-x-64" : "translate-x-0"
@@ -140,7 +159,10 @@ export function ContentMaps({ marcadores }) {
           </button>
         </div>
       </div>
+
+      {/* Botões para filtrar os marcadores */}
       <div className="z-10 absolute flex flex-row items-center justify-around w-[347px] h-[100px] top-4 right-4 bg-[#1F3241] p-4 rounded-lg shadow-lg text-[16px]">
+        {/* Botão para mostrar marcadores "desligados" */}
         <button
           className="flex flex-col items-center justify-center"
           onClick={() => {
@@ -153,6 +175,8 @@ export function ContentMaps({ marcadores }) {
           </div>
           <p>{textOff}</p>
         </button>
+
+        {/* Botão para mostrar marcadores "gerais" */}
         {iconGeneral && (
           <button
             className="flex flex-col items-center justify-center"
@@ -167,6 +191,8 @@ export function ContentMaps({ marcadores }) {
             <p>Geral</p>
           </button>
         )}
+
+        {/* Botão para mostrar marcadores "ligados" */}
         <button
           className="flex flex-col items-center justify-center"
           onClick={() => {
@@ -180,14 +206,17 @@ export function ContentMaps({ marcadores }) {
           <p>{textOn}</p>
         </button>
       </div>
+
+      {/* Componente GoogleMap para exibir o mapa */}
       <GoogleMap
         mapContainerStyle={{ width: "100%", height: "100%" }}
         center={initialPosition}
         zoom={13}
         options={mapOptions}
         onClick={handleMapClick}
-        onLoad={(map) => (mapRef.current = map)} // Adicione a referência do mapa aqui
+        onLoad={(map) => (mapRef.current = map)}
       >
+        {/* Renderiza marcadores filtrados no mapa */}
         {filterMarkers(filterType).map((marker, index) => (
           <CustomMarker
             key={index}
@@ -195,10 +224,24 @@ export function ContentMaps({ marcadores }) {
             label={marker.bairro}
             zoom={13}
             onClick={() => setSelected(marker)}
-            icon={marker.status ? iconEscuridaoOn : iconEscuridaoOff}
+            icon={
+              isMapaEscuridao
+                ? marker.status
+                  ? iconEscuridaoOn
+                  : iconEscuridaoOff
+                : marker.status
+                ? iconEsgotoOn
+                : iconEsgotoOff
+            }
           />
         ))}
-        <CustomInfoWindow selected={selected} setSelected={setSelected} />
+
+        {/* Componente CustomInfoWindow para exibir informações sobre o marcador selecionado */}
+        <CustomInfoWindow
+          isMapaEscuridao={isMapaEscuridao}
+          selected={selected}
+          setSelected={setSelected}
+        />
       </GoogleMap>
     </div>
   );
